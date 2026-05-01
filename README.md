@@ -1,217 +1,178 @@
-<p align="center"><img src="buildroot/share/pixmaps/logo/marlin-outrun-nf-500.png" height="250" alt="MarlinFirmware's logo" /></p>
+# Marlin bugfix-2.1.x — Artillery Genius Pro
 
-<h1 align="center">Marlin 3D Printer Firmware</h1>
+Custom Marlin firmware for the **Artillery Genius Pro** (STM32F401RCT6, BOARD_ARTILLERY_RUBY).
+Hardware-verified configuration based on Marlin bugfix-2.1.x.
 
-<p align="center">
-    <a href="/LICENSE"><img alt="GPL-V3.0 License" src="https://img.shields.io/github/license/marlinfirmware/marlin.svg"></a>
-    <a href="//github.com/MarlinFirmware/Marlin/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/marlinfirmware/marlin.svg"></a>
-    <a href="//github.com/MarlinFirmware/Marlin/releases"><img alt="Last Release Date" src="https://img.shields.io/github/release-date/MarlinFirmware/Marlin"></a>
-    <a href="//github.com/MarlinFirmware/Marlin/actions/workflows/ci-build-tests.yml"><img alt="CI Status" src="https://github.com/MarlinFirmware/Marlin/actions/workflows/ci-build-tests.yml/badge.svg"></a>
-    <a href="//github.com/sponsors/thinkyhead"><img alt="GitHub Sponsors" src="https://img.shields.io/github/sponsors/thinkyhead?color=db61a2"></a>
-    <br />
-    <a href="//bsky.app/profile/marlinfw.org"><img alt="Follow marlinfw.org on Bluesky" src="https://img.shields.io/badge/Follow%20@marlinfw.org-0085ff?logo=bluesky&logoColor=white"></a>
-    <a href="//fosstodon.org/@marlinfirmware"><img alt="Follow MarlinFirmware on Mastodon" src="https://img.shields.io/mastodon/follow/109450200866020466?domain=https%3A%2F%2Ffosstodon.org&logoColor=%2300B&style=social"></a>
-</p>
-
-### 🌍 Translations
-
-<table>
-<tr>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=an">Aragonés</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=bg">Български</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=ca">Català</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=cs">Čeština</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=da">Dansk</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=de">Deutsch</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=el">Ελληνικά</a></td>
-</tr>
-<tr>
-  <td><a href="//github.com/MarlinFirmware/Marlin">English</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=es">Español</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=eu">Euskara</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=fi">Suomi</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=fr">Français</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=gl">Galego</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=hr">Hrvatski</a></td>
-</tr>
-<tr>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=hu">Magyar</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=it">Italiano</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=ja">にほんご</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=ko">한국어</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=nl">Nederlands</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=pl">Polski</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=pt">Português</a></td>
-</tr>
-<tr>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=pt-BR">Português (Brasil)</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=ro">Română</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=ru">Русский</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=sk">Slovenčina</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=sv">Svenska</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=tr">Türkçe</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=uk">Українська</a></td>
-</tr>
-<tr>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=vi">Tiếng Việt</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=zh-CN">简体中文</a></td>
-  <td><a href="//translate.google.com/translate?u=github.com/MarlinFirmware/Marlin&sl=auto&tl=zh-TW">繁體中文</a></td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
-</tr>
-</table>
-
-Official documentation can be found at the [Marlin Home Page](//marlinfw.org/).
-
-Please test this firmware and let us know if it misbehaves in any way. Volunteers are standing by!
+**→ [Download pre-built firmware (v7)](releases/v7/firmware-gpro-v7-0x08000000.bin)**
+**→ [Flash instructions & build guide](releases/v7/README.md)**
+**→ [Recommended: upgrade your TFT screen firmware](releases/tft/TFT_UPGRADE.md)**
 
 ---
 
-## Marlin 2.1 Bugfix Branch
+## Feature Comparison
 
-**Not for production use. Use with caution!**
+Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-for-artillery-genius-pro-bugfix-2.1.x.
 
-Marlin 2.1 supports both 32-bit ARM and 8-bit AVR boards while adding support for up to 9 coordinated axes and to up to 8 extruders.
+### Hardware / Board
 
-This branch is for patches to the latest 2.1.x release version. Periodically this branch will form the basis for the next minor 2.1.x release.
+| Feature | Stock Marlin 2.1.x | gpro-mp | mfagp | Our v7 |
+|---------|-------------------|---------|-------|--------|
+| Board | generic | `BOARD_ARTILLERY_RUBY` | `BOARD_ARTILLERY_RUBY` | `BOARD_ARTILLERY_RUBY` |
+| Dual serial (USB + TFT UART) | 1 port | 2 ports | 2 ports | 2 ports |
+| TFT baud rate | — | 250000 | 115200 | 250000 |
+| BLTouch | off | on | on | on |
+| BLTouch dual-pin wiring | — | yes (Z_MIN_PROBE=PC2, Z_MIN=PA0) | yes | yes — authoritative |
+| Probe hit state | — | HIGH | HIGH | HIGH |
+| Z endstop hit state | — | LOW (NC) | LOW (NC) | LOW (NC) |
+| Calibrated steps/unit | generic | {80.121, 80.121, 402, 449.5} | generic defaults | same as gpro-mp |
+| Calibrated PID hotend | generic | hardware-tuned | generic defaults | hardware-tuned |
+| Calibrated PID bed | generic | hardware-tuned | generic defaults | hardware-tuned |
+| Controller fan auto-management | no | no | yes | no |
+| NeoPixel RGB LED | no | no | yes | no |
 
-Download earlier versions of Marlin on the [Releases page](//github.com/MarlinFirmware/Marlin/releases).
+### G-code Commands
 
-## Example Configurations
+| G-code | Purpose | Stock | gpro-mp | mfagp | Our v7 |
+|--------|---------|-------|---------|-------|--------|
+| M92 | Set steps-per-unit at runtime | no | **no** | yes | yes |
+| M113 | Host keepalive interval | no | no | yes | yes |
+| M114 D | Detailed position | no | no | yes | yes |
+| M115 | Firmware capabilities report | partial | yes | yes | yes |
+| M43 | Pin debug / toggle | no | yes | **no** | yes |
+| M154 | Auto-report position | no | no | **no** | yes |
+| M155 auto on boot | Temps pushed to TFT on boot | no | no | no | **yes** |
+| M211 | Software endstops toggle | yes | **no** | yes | yes |
+| M290 | Babystepping | no | no | yes | yes |
+| M486 | Cancel specific objects | no | no | yes | yes |
+| M593 | Input shaping config | no | no | yes | yes |
+| M600 | Filament change | no | partial | yes | yes |
+| M701/M702 | Load/Unload filament | no | no | no | yes |
+| M73 | Print progress + remaining time | no | no | yes | yes |
+| M810-M819 | G-code macros | no | no | **no** | yes |
+| M876 | Host prompt response | no | no | yes | yes |
+| M900 | Linear Advance K-factor | no | no | yes | yes |
+| M48 | Probe repeatability test | no | no | yes | yes |
 
-Before you can build Marlin for your machine you'll need a configuration for your specific hardware. Upon request, your vendor will be happy to provide you with the complete source code and configurations for your machine, but you'll need to get updated configuration files if you want to install a newer version of Marlin. Fortunately, Marlin users have contributed hundreds of tested configurations to get you started. Visit the [MarlinFirmware/Configurations](//github.com/MarlinFirmware/Configurations) repository to find the right configuration for your hardware. Make sure to select a compatible branch! [The Marlin Download Page](//marlinfw.org/meta/download/) matches compatible software and configuration packages.
+### Bed Leveling
 
-## Building Marlin 2.1
+| Feature | Stock | gpro-mp | mfagp | Our v7 |
+|---------|-------|---------|-------|--------|
+| Leveling method | bilinear | UBL | UBL | UBL |
+| Probe repetitions | 1 | 3 + 1 extra | 3 + 1 extra | 3 + 1 extra |
+| Restore leveling after G28 | no | yes | yes | yes |
+| Segment-leveled moves | no | no | no | **yes** (5 mm) |
+| Assisted tramming (G35) | no | yes | **no** | yes |
 
-To build and upload Marlin you will use one of these tools:
+### Motion / Print Quality
 
-- The free [Visual Studio Code](//code.visualstudio.com/download) using the [Auto Build Marlin](//marlinfw.org/docs/basics/auto_build_marlin.html) extension.
-- Marlin is optimized to build with the [PlatformIO IDE](//platformio.org/) extension for Visual Studio Code.
-- You can also use VSCode with devcontainer : See [Installing Marlin (VSCode devcontainer)](https://marlinfw.org/docs/basics/install_devcontainer_vscode.html).
-- You can still build Marlin with [Arduino IDE](//www.arduino.cc/en/main/software) : See [Building Marlin with Arduino](//marlinfw.org/docs/basics/install_arduino.html). We hope to improve the Arduino build experience, but at this time, PlatformIO is the preferred choice.
+| Feature | Stock | gpro-mp | mfagp | Our v7 |
+|---------|-------|---------|-------|--------|
+| S-curve acceleration | no | yes | yes | yes |
+| Junction Deviation | no | yes | yes | yes |
+| Linear Advance | no | no | yes (K unset) | **yes** (K=0.13) |
+| Input Shaping X+Y | no | no | yes | yes |
+| Input Shaping LCD menu | no | no | yes | yes |
+| Adaptive step smoothing | no | no | yes | yes |
+| Babystepping (always available) | no | no | yes | yes |
+| Arc support (G2/G3) | no | no | yes | yes |
+| AUTOTEMP | no | no | yes | yes |
+| SLOWDOWN (buffer protection) | no | no | yes | yes |
+| QUICK_HOME (simultaneous X+Y) | no | no | yes | yes |
+| VALIDATE_HOMING_ENDSTOPS | no | no | yes | yes |
+| Software endstops (M211) | yes | **no** | yes | yes |
+| Stepper idle timeout | no | no | yes (120 s) | yes (120 s) |
+| MULTISTEPPING_LIMIT | 128 | 16 | 16 | 16 |
 
-## 32-bit ARM boards
+### Safety
 
-Marlin is compatible with a plethora of 32-bit ARM boards, which offer ample computational power and memory and allows Marlin to deliver state-of-the-art performance and features we like to see in modern 3d printers. Some of the newer features in Marlin will require use of a 32-bit ARM board.
+| Feature | Stock | gpro-mp | mfagp | Our v7 |
+|---------|-------|---------|-------|--------|
+| Power loss recovery | no | yes | **no** | yes |
+| Thermal protection hotend | yes | yes | yes | yes |
+| Thermal protection bed | yes | yes | yes | yes |
+| Hardware watchdog | no | no | yes | yes |
+| Detect broken endstop | no | no | yes | yes |
+| Cold extrusion prevention | yes | yes | yes | yes |
 
-## 8-Bit AVR Boards
+### Serial / TFT Communication
 
-Marlin originates from the era of Arduino based 8-bit boards, and we aim to support 8-bit AVR boards in perpetuity. Both 32-bit and 8-bit boards are covered by a single code base that can apply to all machines. Our goal is to support casual hobbyists, tinkerers, and owners of older machines and boards, striving to allow them to benefit from the community's innovations just as much as those with fancier machines and newer boards. In addition, these venerable AVR-based machines are often the best for testing and feedback!
+| Feature | Stock | gpro-mp | mfagp | Our v7 |
+|---------|-------|---------|-------|--------|
+| BUFSIZE (command queue) | 4 | 32 | 32 | 32 |
+| TX_BUFFER_SIZE | 0 | 128 | 128 | 128 |
+| RX_BUFFER_SIZE | 128 | 1024 | 1024 | 1024 |
+| XON/XOFF flow control | no | yes | **no** | yes |
+| Serial overrun protection | no | no | yes | yes |
+| Faster G-code parser | no | no | yes | yes |
+| ADVANCED_OK | no | yes | yes | yes |
+| Emergency parser | no | no | yes | yes |
+| Host action commands | no | no | yes | yes |
+| Host prompt support | no | no | yes | yes |
+| Host keepalive (M113) | no | no | yes | yes |
+| Busy-while-heating | no | no | yes | yes |
+| Auto-report temperatures | yes | yes | yes | yes |
+| Auto-report position (M154) | no | no | **no** | yes |
+| M73 progress reporting | no | no | yes | yes |
+| Startup auto-temp push | no | no | **no** | **yes** |
+| Capabilities report (M115) | partial | yes | yes | yes |
+| Extended capabilities report | no | no | yes | yes |
 
-## Hardware Abstraction Layer (HAL)
+### SD Card / Storage
 
-Marlin's Hardware Abstraction Layer provides a common API for all the platforms it targets. This allows Marlin code to address the details of motion and user interface tasks at the lowest and highest levels with no system overhead, tying all events directly to the hardware clock.
+| Feature | Stock | gpro-mp | mfagp | Our v7 |
+|---------|-------|---------|-------|--------|
+| Long filename support | no | no | yes | yes |
+| Auto-report SD status (M27) | no | yes | yes | yes |
+| SD block retry on error | no | no | no | **yes** |
+| Most-recent files first | no | no | yes | yes |
+| SD abort G-code (G28XY) | no | no | yes | yes |
+| Cancel objects (M486) | no | no | yes | yes |
+| G-code macros (M810-M819) | no | no | **no** | yes |
 
-Every new HAL opens up a world of hardware. Marlin currently has HALs for more than a dozen platforms. While AVR and STM32 are the most well known and popular ones, others like ESP32 and LPC1768 support a variety of less common boards. At this time, an HAL for RP2040 is available in beta; we would like to add one for the Duet3D family of boards. A HAL that wraps an RTOS is an interesting concept that could be explored.
+---
 
-Did you know that Marlin includes a Simulator that can run on Windows, macOS, and Linux? Join the Discord to help move these sub-projects forward!
+## Firmware Download
 
-### Supported Platforms
+| File | Description |
+|------|-------------|
+| [firmware-gpro-v7-0x08000000.bin](releases/v7/firmware-gpro-v7-0x08000000.bin) | Pre-built binary — flash at `0x08000000` |
+| [releases/v7/README.md](releases/v7/README.md) | Flash instructions, build guide, post-flash calibration |
+| [releases/v7/MERGE_REPORT.md](releases/v7/MERGE_REPORT.md) | Full audit log of every configuration decision |
 
-| Platform | MCU | Example Boards |
-| --- | --- | --- |
-| [Arduino AVR](//www.arduino.cc/) | ATmega | RAMPS, Melzi, RAMBo |
-| [Teensy++ 2.0](//www.microchip.com/en-us/product/AT90USB1286) | AT90USB1286 | Printrboard |
-| [Arduino Due](//www.arduino.cc/en/Guide/ArduinoDue) | SAM3X8E | RAMPS-FD, RADDS, RAMPS4DUE |
-| [ESP32](//github.com/espressif/arduino-esp32) | ESP32 | FYSETC E4, E4d@BOX, MRR |
-| [GD32](//www.gigadevice.com/) | GD32 ARM Cortex-M4 | Creality MFL GD32 V4.2.2 |
-| [HC32](//www.huazhoucn.com/) | HC32 | Ender-2 Pro, Voxelab Aquila |
-| [LPC1768](//www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/general-purpose-mcus/lpc1700-cortex-m3/512-kb-flash-64-kb-sram-ethernet-usb-lqfp100-package:LPC1768FBD100) | ARM® Cortex-M3 | MKS SBASE, Re-ARM, Selena Compact |
-| [LPC1769](//www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/general-purpose-mcus/lpc1700-cortex-m3/512-kb-flash-64-kb-sram-ethernet-usb-lqfp100-package:LPC1769FBD100) | ARM® Cortex-M3 | Smoothieboard, Azteeg X5 mini, TH3D EZBoard |
-| [Pico RP2040](//www.raspberrypi.com/documentation/microcontrollers/pico-series.html) | Dual Cortex M0+ | BigTreeTech SKR Pico |
-| [STM32F103](//www.st.com/en/microcontrollers-microprocessors/stm32f103.html) | ARM® Cortex-M3 | Malyan M200, GTM32 Pro, MKS Robin, BTT SKR Mini |
-| [STM32F401](//www.st.com/en/microcontrollers-microprocessors/stm32f401.html) | ARM® Cortex-M4 | ARMED, Rumba32, SKR Pro, Lerdge, FYSETC S6, Artillery Ruby |
-| [STM32F7x6](//www.st.com/en/microcontrollers-microprocessors/stm32f7x6.html) | ARM® Cortex-M7 | The Borg, RemRam V1 |
-| [STM32G0B1RET6](//www.st.com/en/microcontrollers-microprocessors/stm32g0x1.html) | ARM® Cortex-M0+ | BigTreeTech SKR mini E3 V3.0 |
-| [STM32H743xIT6](//www.st.com/en/microcontrollers-microprocessors/stm32h743-753.html) | ARM® Cortex-M7 | BigTreeTech SKR V3.0, SKR EZ V3.0, SKR SE BX V2.0/V3.0 |
-| [SAMD21P20A](//www.adafruit.com/product/4064) | ARM® Cortex-M0+ | Adafruit Grand Central M4 |
-| [SAMD51P20A](//www.adafruit.com/product/4064) | ARM® Cortex-M4 | Adafruit Grand Central M4 |
-| [Teensy 3.2/3.1](//www.pjrc.com/teensy/teensy31.html) | MK20DX256VLH7 ARM® Cortex-M4 |
-| [Teensy 3.5](//www.pjrc.com/store/teensy35.html) | MK64FX512-VMD12 ARM® Cortex-M4 |
-| [Teensy 3.6](//www.pjrc.com/store/teensy36.html) | MK66FX1MB-VMD18 ARM® Cortex-M4 |
-| [Teensy 4.0](//www.pjrc.com/store/teensy40.html) | MIMXRT1062-DVL6B ARM® Cortex-M7 |
-| [Teensy 4.1](//www.pjrc.com/store/teensy41.html) | MIMXRT1062-DVJ6B ARM® Cortex-M7 |
-| Linux Native | x86 / ARM / RISC-V | Raspberry Pi GPIO |
-| Simulator | Windows, macOS, Linux | Desktop OS |
-| [All supported boards](//marlinfw.org/docs/hardware/boards.html#boards-list) | All platforms | All boards |
+## TFT Screen Firmware (Recommended)
 
-## Marlin Discord
+The Artillery Genius Pro ships with an outdated TFT firmware. Upgrading it unlocks better compatibility with this Marlin build and fixes several touchscreen bugs.
 
-The [Marlin Firmware Discord](//discord.gg/marlin-firmware-461605380783472640) is a great place to discuss issues with Marlin users and developers, get interactive help with troubleshooting, and build on your best ideas to improve to Marlin in tandem with the most active members of the development team.
+**[TFT upgrade guide →](releases/tft/TFT_UPGRADE.md)**
 
-<p align="center">
-  <a target="_blank" href="https://discord.gg/marlin-firmware-461605380783472640">
-    <img src="https://dcbadge.limes.pink/api/server/https://discord.gg/marlin-firmware-461605380783472640">
-  </a>
-</p>
+---
 
-## Other Marlin Support
+## Build from Source
 
-The Issue Queue is reserved for Bug Reports and Feature Requests. Please use the following resources for help with configuration and troubleshooting:
+```bash
+git clone https://github.com/persano/Marlin.git
+cd Marlin
+git checkout artillery-genius-pro
+python -m platformio run -e Artillery_Ruby
+# output: .pio/build/Artillery_Ruby/firmware.bin
+```
 
-- [Marlin Documentation](//marlinfw.org) - Official Marlin documentation
-- ["Marlin Firmware"](//www.facebook.com/groups/1049718498464482/) Facebook Group
-- [Marlin Forum](//forums.reprap.org/list.php?415) at RepRap.org
-- ["Marlin Firmware for 3D Printers"](//www.facebook.com/groups/3Dtechtalk/) Facebook Group
-- [Marlin Configuration](//www.youtube.com/results?search_query=marlin+configuration) playlist on YouTube
+Requires [PlatformIO](https://platformio.org/) and Python 3.
 
-## Contributing Patches
+---
 
-Contribute your patches to Marlin by submitting a Pull Request to the ([bugfix-2.1.x](//github.com/MarlinFirmware/Marlin/tree/bugfix-2.1.x)) branch.
+## Hardware
 
-- We use the `bugfix-2.1.x` branch to fix bugs and integrate new features into the latest firmware. Use with caution!
-- We maintain `lts-x.x.x` branches, mainly for vendors, so that older versions of Marlin can be patched as-needed to stay functional and fix bugs.
-- Follow the [Coding Standards](//marlinfw.org/docs/development/coding_standards.html) to gain points with the maintainers.
-- Please submit Feature Requests and Bug Reports to the [Issue Queue](//github.com/MarlinFirmware/Marlin/issues/new/choose). See above for user support.
-- Whenever you add new features, be sure to add one or more build tests to `buildroot/tests`. Any tests added to a PR will be run within that PR on GitHub servers as soon as they are pushed. To minimize iteration be sure to run your new tests locally, if possible.
-  - Local build tests:
-    - All: `make tests-config-all-local`
-    - Single: `make tests-config-single-local TEST_TARGET=...`
-  - Local build tests in Docker:
-    - All: `make tests-config-all-local-docker`
-    - Single: `make tests-config-all-local-docker TEST_TARGET=...`
-  - To run all unit test suites:
-    - Using PIO: `platformio run -t test-marlin`
-    - Using Make: `make unit-test-all-local`
-    - Using Docker + make: `make unit-test-all-local-docker`
-  - To run a single unit test suite:
-    - Using PIO: `platformio run -t marlin_<test-suite-name>`
-    - Using make: `make unit-test-single-local TEST_TARGET=<test-suite-name>`
-    - Using Docker + make: `make unit-test-single-local-docker TEST_TARGET=<test-suite-name>`
-- If your feature can be unit tested, add one or more unit tests. For more information see our documentation on [Unit Tests](test).
+| Component | Part |
+|-----------|------|
+| MCU | STM32F401RCT6 @ 84 MHz |
+| Board | Artillery Ruby |
+| Extruder | Direct drive |
+| Probe | BLTouch |
+| Display | BTT TFT28 (GD32F305 variant) |
 
-## Contributors
-
-Marlin is constantly improving thanks to a huge number of contributors from all over the world bringing their specialties and talents. Huge thanks are due to [all the contributors](//github.com/MarlinFirmware/Marlin/graphs/contributors) who regularly patch up bugs, help direct traffic, and basically keep Marlin from falling apart. Marlin's continued existence would not be possible without them.
-
-Marlin Firmware original logo design by Ahmet Cem TURAN [@ahmetcemturan](//github.com/ahmetcemturan).
-
-## Project Leadership
-
-| Name | Role | Link | Donate |
-| --- | --- | --- | --- |
-| 🇺🇸 Scott Lahteine | Project Lead | [[@thinkyhead](//github.com/thinkyhead)] | [❤️ Donate](//marlinfw.org/docs/development/contributing.html#donate) |
-| 🇳🇿 Peter Ellens | Admin | [[@ellensp](//github.com/ellensp)] | [❤️ Donate](//ko-fi.com/ellensp) |
-| 🇬🇧 Chris Pepper | Admin | [[@p3p](//github.com/p3p)] |
-| 🇺🇸 Keith Bennett | Admin | [[@thisiskeithb](//github.com/thisiskeithb)] | [❤️ Donate](//github.com/sponsors/thisiskeithb) |
-| 🇺🇸 Roxanne Neufeld | Admin | [[@Roxy-3D](//github.com/Roxy-3D)] |
-| 🇺🇸 Jason Smith | Admin | [[@sjasonsmith](//github.com/sjasonsmith)] |
-| 🇧🇷 Victor Oliveira | Admin | [[@rhapsodyv](//github.com/rhapsodyv)] |
-| 🇺🇸 Bob Kuhn | Admin | [[@Bob-the-Kuhn](//github.com/Bob-the-Kuhn)] |
-| 🇳🇱 Erik van der Zalm | Founder | [[@ErikZalm](//github.com/ErikZalm)] |
-
-## Star History
-
-<a id="starchart" href="//star-history.com/#MarlinFirmware/Marlin&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MarlinFirmware/Marlin&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MarlinFirmware/Marlin&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MarlinFirmware/Marlin&type=Date" />
-  </picture>
-</a>
+---
 
 ## License
 
-Marlin is published under the [GPL license](/LICENSE) because we believe in open development. The GPL comes with both rights and obligations. Whether you use Marlin firmware as the driver for your open or closed-source product, you must keep Marlin open, and you must provide your compatible Marlin source code to end users upon request. The most straightforward way to comply with the Marlin license is to make a fork of Marlin on GitHub, perform your modifications, and direct users to your modified fork.
+Marlin firmware is licensed under [GPL v3](https://www.gnu.org/licenses/gpl-3.0.html). Configuration files in this branch follow the same license.
