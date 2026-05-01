@@ -143,6 +143,8 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 The Artillery Genius Pro ships with an outdated TFT firmware. Upgrading it unlocks better compatibility with this Marlin build and fixes several touchscreen bugs.
 
+> **Before flashing:** the Artillery Genius Pro may ship with either a **GD32F305** or an **STM32** TFT28 variant. The files provided are for the **GD32F305 only**. Verify your chip in the TFT About screen before proceeding — the upgrade guide explains how.
+
 **[TFT upgrade guide →](releases/tft/TFT_UPGRADE.md)**
 
 ---

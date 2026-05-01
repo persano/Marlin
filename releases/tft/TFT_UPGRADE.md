@@ -2,9 +2,37 @@
 
 > **Recommended.** The Artillery Genius Pro ships with an outdated TFT firmware that lacks support for many features enabled in this Marlin build (host actions, M73 progress bar, proper filament change prompts, UBL mesh visualizer, etc.). This guide upgrades it to the latest community-maintained version.
 
-The screen in the Artillery Genius Pro is a **BTT TFT28 with a GD32F305 chip** (`TFT28_GD32F305`). This is important — the GD32 variant requires its own bootloader and firmware binary.
+> [!WARNING]
+> **Verify your screen chip before proceeding.** The Artillery Genius Pro may ship with either a **GD32F305** or an **STM32** variant of the TFT28. The files in this guide are for the **GD32F305 only**. Flashing the wrong binary will brick your screen. **Do not continue until you have confirmed your chip.**
 
-All files referenced in this guide are in the [`releases/tft/`](./) folder of this repository.
+---
+
+## Step 0 — Verify Your Screen Chip
+
+**You must do this before flashing anything.**
+
+### How to check
+
+**Option A — TFT info screen (easiest):**
+
+1. On your TFT touchscreen, go to **Menu → Settings → About** (or **Screen Info**, depending on your current firmware version)
+2. The chip name is displayed — look for `GD32F305` or `STM32F207`
+
+**Option B — Boot screen:**
+
+Some firmware versions briefly show the chip identifier during boot. Power-cycle the printer and watch the TFT boot screen for a chip name.
+
+**Option C — Physical inspection (last resort):**
+
+Power off and look at the chip on the TFT PCB. The largest IC on the board will be labelled `GD32F305` or `STM32F207` (or similar STM32 part number).
+
+### What to do based on your result
+
+| Chip found | Action |
+|-----------|--------|
+| `GD32F305` | You can proceed with this guide |
+| `STM32F207` or any other STM32 | **Do NOT use these files.** Look for STM32-specific TFT firmware for your screen size at [kisslorand/BTT-TFT-FW](https://github.com/kisslorand/BTT-TFT-FW) |
+| Unsure / can't identify | **Stop. Do not flash anything until confirmed.** Ask in the Artillery community or open an issue in this repo |
 
 ---
 
