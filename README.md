@@ -5,7 +5,7 @@ Hardware-verified configuration based on Marlin bugfix-2.1.x.
 
 **→ [Download pre-built firmware (v7)](releases/v7/firmware-gpro-v7-0x08000000.bin)**
 **→ [Flash instructions & build guide](releases/v7/README.md)**
-**→ [Recommended: upgrade your TFT screen firmware](releases/tft/TFT_UPGRADE.md)**
+**→ [Recommended: upgrade your TFT screen firmware](releases/tft/README.md)**
 
 ---
 
@@ -145,7 +145,7 @@ The Artillery Genius Pro ships with an outdated TFT firmware. Upgrading it unloc
 
 > **Before flashing:** the Artillery Genius Pro may ship with either a **GD32F305** or an **STM32** TFT28 variant. The files provided are for the **GD32F305 only**. Verify your chip in the TFT About screen before proceeding — the upgrade guide explains how.
 
-**[TFT upgrade guide →](releases/tft/TFT_UPGRADE.md)**
+**[TFT upgrade guide →](releases/tft/README.md)**
 
 ---
 
