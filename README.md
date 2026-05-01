@@ -178,3 +178,11 @@ Requires [PlatformIO](https://platformio.org/) and Python 3.
 ## License
 
 Marlin firmware is licensed under [GPL v3](https://www.gnu.org/licenses/gpl-3.0.html). Configuration files in this branch follow the same license.
+
+---
+
+## How It Looks
+
+With both the Marlin v7 firmware and the latest TFT firmware running, the info screen confirms the full setup — firmware version, capabilities, and screen chip all in one place.
+
+![TFT info screen with v7 Marlin and latest TFT firmware](releases/tft/tft-info-screen.jpeg)

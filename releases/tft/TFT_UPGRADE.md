@@ -18,8 +18,6 @@
 1. On your TFT touchscreen, go to **Menu → Settings → About** (or **Screen Info**, depending on your current firmware version)
 2. The chip name is displayed — look for `GD32F305` or `STM32F207`
 
-![TFT info screen showing chip identifier](tft-info-screen.jpeg)
-
 **Option B — Boot screen:**
 
 Some firmware versions briefly show the chip identifier during boot. Power-cycle the printer and watch the TFT boot screen for a chip name.
