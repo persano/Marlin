@@ -52,15 +52,21 @@ This is a one-time operation. The bootloader v3.0.5 is required for the new firm
 **Files needed** (from [`releases/tft/bootloader/`](bootloader/)):
 - `MKSTFT28EVO.bin`
 - `mks_config.txt`
+- `mks_font/` — empty folder, **must be present**
+- `mks_pic/` — empty folder, **must be present**
+
+> The old bootloader checks for `mks_font/` and `mks_pic/` on the SD card as part of its update detection. If either folder is missing the update will not start. See [bootloader/README.md](bootloader/README.md) for details.
 
 **How to flash:**
 
 1. Format a microSD card as **FAT32** (≤32 GB, allocation unit 4096 bytes)
-2. Copy both files to the **root** of the SD card:
+2. Copy all four items to the **root** of the SD card:
    ```
    SD root/
      MKSTFT28EVO.bin
      mks_config.txt
+     mks_font/            ← empty folder, required
+     mks_pic/             ← empty folder, required
    ```
 3. Power off the printer
 4. Insert the SD card into the **TFT screen's SD slot** (the small slot on the side of the screen — not the mainboard slot)
