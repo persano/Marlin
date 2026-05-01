@@ -530,6 +530,74 @@
 //#define SENSORLESS_HOMING
 
 //===========================================================================
+//====================== Fixed-Time Motion (FT Motion) ======================
+//===========================================================================
+
+// @section motion
+
+/**
+ * Fixed-Time Motion (FT Motion) — BETA FEATURE
+ * ADDED: per user specification
+ *
+ * FT Motion uses a fixed-time trajectory planner with its own built-in shaping.
+ * Standard motion (INPUT_SHAPING_X/Y) remains compiled in alongside FT Motion.
+ * Use M493 S1 to enable FT Motion, M493 S0 to return to standard motion.
+ *
+ * Shaping frequencies carry over from the INPUT_SHAPING values above.
+ * Re-measure with ADXL345 on this specific machine and update DEFAULT_FREQ values.
+ * Enable/disable at runtime: M493 S<0/1>
+ * Adjust shaper: M493 A<axis> S<type> F<hz> Z<zeta>
+ */
+#define FT_MOTION
+#if ENABLED(FT_MOTION)
+  //#define FTM_IS_DEFAULT_MOTION               // Make FT Motion the power-on default (M493 not needed after boot)
+  //#define NO_STANDARD_MOTION                  // Remove standard planner entirely (saves Flash/RAM; disable INPUT_SHAPING_X/Y first)
+
+  // Shaper algorithms compiled into the binary — comment out unused ones to save Flash
+  #define FTM_SHAPER_ZV
+  #define FTM_SHAPER_ZVD
+  //#define FTM_SHAPER_ZVDD
+  //#define FTM_SHAPER_ZVDDD
+  //#define FTM_SHAPER_EI
+  //#define FTM_SHAPER_2HEI
+  //#define FTM_SHAPER_3HEI
+  #define FTM_SHAPER_MZV
+
+  // X axis — initial values carried from INPUT_SHAPING_X above; re-measure on Genius Pro
+  #define FTM_DEFAULT_SHAPER_X      ftMotionShaper_ZV  // (NONE, ZV, ZVD, ZVDD, ZVDDD, EI, 2HEI, 3HEI, MZV)
+  #define FTM_SHAPING_DEFAULT_FREQ_X   55.0f           // (Hz) from SHAPING_FREQ_X
+  #define FTM_SHAPING_ZETA_X            0.1f           // from SHAPING_ZETA_X
+
+  // Y axis — initial values carried from INPUT_SHAPING_Y above; re-measure on Genius Pro
+  #define FTM_DEFAULT_SHAPER_Y      ftMotionShaper_ZV  // (NONE, ZV, ZVD, ZVDD, ZVDDD, EI, 2HEI, 3HEI, MZV)
+  #define FTM_SHAPING_DEFAULT_FREQ_Y   48.6f           // (Hz) from SHAPING_FREQ_Y
+  #define FTM_SHAPING_ZETA_Y            0.1f           // from SHAPING_ZETA_Y
+
+  // Z axis — leadscrew drive, no shaping needed
+  #define FTM_DEFAULT_SHAPER_Z      ftMotionShaper_NONE
+  #define FTM_SHAPING_DEFAULT_FREQ_Z   21.0f
+  #define FTM_SHAPING_ZETA_Z            0.03f
+
+  // Extruder axis
+  #define FTM_DEFAULT_SHAPER_E      ftMotionShaper_NONE
+  #define FTM_SHAPING_DEFAULT_FREQ_E   21.0f
+  #define FTM_SHAPING_ZETA_E            0.03f
+
+  // Trajectory profile
+  #define FTM_POLYS                              // Include POLY5/POLY6 support (~3k Flash overhead)
+  #if ENABLED(FTM_POLYS)
+    #define FTM_TRAJECTORY_TYPE TRAPEZOIDAL      // TRAPEZOIDAL (continuous velocity), POLY5, or POLY6 (S-curve)
+    #define FTM_POLY6_ACCELERATION_OVERSHOOT 1.875f // Max acceleration overshoot for POLY6 (1.25–1.875)
+  #endif
+
+  // Core timing
+  #define FTM_BUFFER_SIZE  128   // (entries) Power of 2 required; 128 = 128 ms buffer at 1 kHz
+  #define FTM_FS          1000   // (Hz) Trajectory generation rate
+  #define FTM_MIN_SHAPE_FREQ  20 // (Hz) Minimum shaping frequency; lower values consume more RAM
+
+#endif // FT_MOTION
+
+//===========================================================================
 //====================== Summary ============================================
 //===========================================================================
 //
@@ -569,5 +637,6 @@
 //   M114_DETAIL
 //   REPORT_FAN_CHANGE
 //   HOST_ACTION_COMMANDS + HOST_PROMPT_SUPPORT + HOST_STATUS_NOTIFICATIONS
+//   FT_MOTION (ZV default; ZV+ZVD+MZV compiled in; SHAPING_FREQ_X=55.0 Hz, Y=48.6 Hz)
 //
 //===========================================================================
