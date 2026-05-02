@@ -638,7 +638,7 @@
 #if ENABLED(FILAMENT_RUNOUT_SENSOR)
   #define NUM_RUNOUT_SENSORS   1
   #define FIL_RUNOUT_PIN       PA0   // Z-MIN connector (original Z endstop, repurposed)
-  #define FIL_RUNOUT_STATE     HIGH  // HIGH = filament absent (NO sensor: pin floats HIGH via pullup when no filament)
+  #define FIL_RUNOUT_STATE     LOW   // LOW = filament absent (NC sensor: pin pulled LOW to GND when no filament)
   #define FIL_RUNOUT_PULLUP         // Use internal pullup on FIL_RUNOUT_PIN
   #define FILAMENT_RUNOUT_SCRIPT "M600"
   //#define FILAMENT_RUNOUT_DISTANCE_MM 7  // (mm) extrude this far before pausing; 0 = immediate
