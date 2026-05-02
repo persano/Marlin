@@ -53,7 +53,7 @@
 | M593 | Input shaping config | no | no | yes | yes |
 | M600 | Filament change | no | partial | yes | yes |
 | M701/M702 | Load/Unload filament | no | no | no | yes |
-| M73 | Set print progress + remaining time | no | no | yes | yes |
+| M73 | Set print progress + remaining time | no | no | yes | no |
 | M810–M819 | G-code macros | no | no | **no** | yes |
 | M876 | Host prompt response | no | no | yes | yes |
 | M900 | Linear Advance K-factor | no | no | yes | yes |
