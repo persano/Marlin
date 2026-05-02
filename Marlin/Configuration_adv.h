@@ -293,7 +293,7 @@
 #if ENABLED(SET_PROGRESS_MANUALLY)
   #define SET_PROGRESS_PERCENT    // Add M73 G-code to set display progress percentage
   #define SET_REMAINING_TIME      // Add M73 G-code to set remaining print time
-  #define M73_REPORT              // ADDED: report M73 values back to host (TFT)
+  //#define M73_REPORT            // REMOVED: was spamming TFT with notifications every minute during SD prints
   #if ALL(M73_REPORT, HAS_MEDIA)
     //#define M73_REPORT_SD_ONLY  // Report only when printing from SD card
   #endif
@@ -619,7 +619,7 @@
 //   ABL_BILINEAR_SUBDIVISION (included, no effect with UBL active)
 //   SET_PROGRESS_MANUALLY (renamed from LCD_SET_PROGRESS_MANUALLY)
 //   SHOW_REMAINING_TIME
-//   M73_REPORT
+//   M73_REPORT              DISABLED (was spamming TFT every minute)
 //   ADVANCED_PAUSE_FEATURE + PARK_HEAD_ON_PAUSE + FILAMENT_LOAD_UNLOAD_GCODES
 //   CANCEL_OBJECTS
 //   GCODE_MACROS
