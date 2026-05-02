@@ -75,10 +75,27 @@ M500             ; save to EEPROM
 
 ---
 
+## Change: Temperature broadcast during host-controlled preheat
+
+### What changed
+
+`my-fork/Marlin/src/module/temperature.cpp` — 4 lines added across two wait loops.
+
+### Why
+
+When printing via a USB host (e.g. BeagleCam), the printer's M109/M190 blocking wait loop sends the 1-second temperature heartbeat only to the requesting serial port (USB). The TFT's serial port (UART) received nothing during preheat, so the TFT screen showed stale temperatures while heating up.
+
+The `auto_reporter.tick()` path (M155) would normally broadcast to all ports every 2 seconds, but most host tools send `M155 S0` on connect, disabling it globally.
+
+### Fix
+
+Added `PORT_REDIRECT(SerialMask::All)` + `PORT_RESTORE()` around the `print_heater_states()` block in both `wait_for_hotend()` and `wait_for_bed()`. This broadcasts the existing 1-second temperature update to all serial ports unconditionally during any blocking preheat — no config required, and unaffected by whether the host disables M155.
+
+---
+
 ## Files changed
 
 | File | Change |
 |------|--------|
 | `Marlin/Configuration_adv.h` | +69 lines (FT_MOTION block) |
-
-No other files were modified.
+| `Marlin/src/module/temperature.cpp` | +4 lines (broadcast preheat temps to all ports) |

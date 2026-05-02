@@ -4626,6 +4626,7 @@ void Temperature::isr() {
         now = millis();
         if (ELAPSED(now, next_temp_ms)) { // Print temp & remaining time every 1s while waiting
           next_temp_ms = now + 1000UL;
+          PORT_REDIRECT(SerialMask::All);
           print_heater_states(target_extruder);
           #if TEMP_RESIDENCY_TIME > 0
             SString<20> s(F(" W:"));
@@ -4636,6 +4637,7 @@ void Temperature::isr() {
             s.echo();
           #endif
           SERIAL_EOL();
+          PORT_RESTORE();
         }
 
         marlin.idle();
@@ -4820,6 +4822,7 @@ void Temperature::isr() {
         now = millis();
         if (ELAPSED(now, next_temp_ms)) { //Print Temp Reading every 1 second while heating up.
           next_temp_ms = now + 1000UL;
+          PORT_REDIRECT(SerialMask::All);
           print_heater_states(motion.extruder);
           #if TEMP_BED_RESIDENCY_TIME > 0
             SString<20> s(F(" W:"));
@@ -4830,6 +4833,7 @@ void Temperature::isr() {
             s.echo();
           #endif
           SERIAL_EOL();
+          PORT_RESTORE();
         }
 
         marlin.idle();
