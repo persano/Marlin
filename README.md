@@ -161,6 +161,45 @@ When filament runs out, the printer pauses and triggers `M600` (filament change)
 | [releases/v9/README.md](releases/v9/README.md) | Flash instructions, build guide, post-flash calibration |
 | [releases/v9/MERGE_REPORT.md](releases/v9/MERGE_REPORT.md) | Full audit log of every configuration decision |
 
+---
+
+## How to Flash
+
+The Artillery Genius Pro uses **SD card flashing** — no USB cable, no drivers, no special software required.
+
+### What you need
+
+- A microSD card (FAT32, ≤ 32 GB)
+- The `.bin` file from the Firmware Download section above
+
+### Steps
+
+1. Format the SD card as FAT32 (if not already).
+2. Copy `firmware-gpro-v9-0x08000000.bin` to the **root** of the SD card.
+3. Rename the file to **`firmware.bin`** — the bootloader looks for this exact name.
+4. Power off the printer.
+5. Insert the SD card into the **mainboard SD slot** — the small slot on the side of the control board, **not** the one on the TFT screen.
+6. Power on. The status LED on the board will blink rapidly for ~10 seconds while flashing.
+7. Once the LED stops blinking or the printer boots normally, power cycle.
+8. Send `M502` then `M500` from the terminal or TFT console to reset EEPROM to firmware defaults and save them.
+
+> **Important:** `M502` + `M500` after every flash. Old EEPROM data from a previous firmware version can cause erratic behavior.
+
+### After flashing
+
+Re-run bed leveling — the mesh is stored in EEPROM and is not affected by `M502`, but it is good practice to re-verify after any firmware update:
+
+```
+G28        ; home all axes
+G29 P1     ; UBL automated mesh
+G29 P3     ; fill any unmeasured points
+G29 S1     ; save mesh to slot 1
+M420 S1    ; enable leveling
+M500       ; persist to EEPROM
+```
+
+See [releases/v9/README.md](releases/v9/README.md) for the full post-flash calibration sequence including Linear Advance and Input Shaping.
+
 ## TFT Screen Firmware (Recommended)
 
 The Artillery Genius Pro ships with an outdated TFT firmware. Upgrading it unlocks better compatibility with this Marlin build and fixes several touchscreen bugs.
