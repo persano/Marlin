@@ -58,9 +58,13 @@ The board will reboot into DFU mode and appear as a USB DFU device on your PC.
 
 The Genius Pro filament sensor is now enabled. When filament runs out, the printer pauses and triggers `M600` (filament change).
 
-**Wiring required:** connect the filament sensor to the **Z endstop connector on the right side of the mainboard** — not the stock Z endstop connector on the left. The right-side connector maps to pin PA0, which is freed when BLTouch is installed (Z homing is handled by the BLTouch probe on PC2, not the physical endstop). The stock Z endstop cable (left-side connector) should remain disconnected.
+**Rewiring required:** the sensor is connected to the TFT board by default — Marlin cannot read it there. Move the cable to the mainboard:
 
-The sensor is NC (Normally Closed): no filament = pin LOW (circuit closed to GND = runout triggered); filament present = pin HIGH.
+1. Unplug the sensor cable from the connector near the top of the base on the **left side** of the gantry.
+2. Remove the cable runs securing it to the left side, then route the cable down the **right side** of the gantry.
+3. Plug it into the exposed connector on the right side — this is the **PA0 (Z-MIN) pin** on the mainboard.
+
+The sensor is a switch: filament present = pin LOW; no filament = pin HIGH (runout triggered). Enable/disable and runout distance can be set at runtime with `M412`.
 
 **Fan kickstart (`FAN_KICKSTART_TIME 100`)**
 

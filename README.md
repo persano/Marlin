@@ -135,21 +135,20 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ---
 
-## Filament Runout Sensor — Wiring Required
+## Filament Runout Sensor — Rewiring Required
 
-> **This requires a wiring change.** Without it the filament runout sensor will not work, even though it is enabled in the firmware.
-
-The Genius Pro filament sensor must be connected to the **Z endstop connector on the right side of the mainboard**, not to the stock connector on the left.
-
-**Why:** the right-side connector maps to pin **PA0** (the original Z-MIN endstop input). Once BLTouch is installed, Z homing is handled by the BLTouch probe on PC2, so PA0 is freed and repurposed here. The left-side Z endstop connector is a different pin and is unused in this build.
+> **The filament sensor is connected to the TFT board by default, not the mainboard.** Marlin cannot read it there. You must move the cable to the mainboard for this feature to work.
 
 **What to do:**
 
-1. Locate the two Z endstop connectors on the Artillery Ruby mainboard — one on the left side, one on the right side.
-2. Move the filament sensor cable to the **right-side connector**.
-3. Leave the stock Z endstop cable (left-side connector) disconnected.
+1. The sensor cable runs up the **left side** of the gantry (when facing the front of the printer) and plugs into a connector near the top of the base, just under the bed.
+2. Unplug it from that connector and remove the cable runs securing it to the left side of the gantry.
+3. Run the cable down the **right side** of the gantry instead.
+4. Plug it into the exposed connector on the right side — this connects to the **PA0 (Z-MIN) pin** on the Artillery Ruby mainboard.
 
-When filament runs out, the printer pauses and triggers `M600` (filament change). The sensor is NC (Normally Closed): no filament = pin LOW (runout triggered); filament present = pin HIGH. The runout distance and enable/disable can be controlled at runtime with `M412`.
+**Why PA0:** once BLTouch is installed, Z homing is handled by the BLTouch probe on PC2, freeing the original Z endstop pin (PA0) for reuse as the filament sensor input.
+
+When filament runs out, the printer pauses and triggers `M600` (filament change). The sensor is a switch: filament present = switch closed = pin LOW; no filament = switch open = pin HIGH (runout triggered). Enable/disable and runout distance can be controlled at runtime with `M412`.
 
 ---
 

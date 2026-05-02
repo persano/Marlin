@@ -29,7 +29,7 @@ The Artillery Genius Pro has a filament runout sensor. The pin used is **PA0** �
 | `FILAMENT_RUNOUT_SENSOR` | (gate) | Enables the feature |
 | `NUM_RUNOUT_SENSORS` | `1` | One sensor for one extruder |
 | `FIL_RUNOUT_PIN` | `PA0` | Z-MIN connector (original Z endstop, repurposed) |
-| `FIL_RUNOUT_STATE` | `LOW` | Pin is LOW when filament is absent (NC sensor: pin pulled LOW to GND when no filament) |
+| `FIL_RUNOUT_STATE` | `HIGH` | Pin is HIGH when filament is absent (switch open = pullup pulls HIGH; filament present = switch closes to GND = LOW) |
 | `FIL_RUNOUT_PULLUP` | (gate) | Internal pullup on FIL_RUNOUT_PIN |
 | `FILAMENT_RUNOUT_SCRIPT` | `"M600"` | Triggers Advanced Pause / filament change on runout |
 
@@ -37,11 +37,13 @@ The Artillery Genius Pro has a filament runout sensor. The pin used is **PA0** �
 
 ### Wiring note
 
-Connect the filament sensor to the **Z endstop connector on the right side of the mainboard**, not the stock connector on the left. The right-side connector is PA0 — the original Z-MIN endstop pin, freed once BLTouch takes over Z homing. The stock Z endstop cable (left-side connector) should remain disconnected.
+**The filament sensor is connected to the TFT board by default, not the mainboard.** Marlin cannot read it from the TFT. The cable must be physically moved:
 
-The sensor is NC (Normally Closed): when no filament is present the circuit is closed, pulling the pin LOW. `FIL_RUNOUT_STATE LOW` triggers runout when the pin is LOW — i.e., when no filament is present.
+1. Unplug the sensor cable from the connector on the **left side** of the gantry (near the top of the base).
+2. Route the cable down the **right side** of the gantry.
+3. Plug it into the connector on the right side — this is **PA0**, the original Z-MIN endstop pin, freed once BLTouch takes over Z homing via PC2.
 
-PA0 is still listed as `Z_MIN_ENDSTOP_HIT_STATE LOW` in the config. Since BLTouch handles Z homing via PC2, the Z_MIN endstop is never actively checked during homing — this is harmless.
+The sensor is a simple switch: filament present = switch closes to GND = pin LOW; no filament = switch open = pullup pulls pin HIGH = runout triggered (`FIL_RUNOUT_STATE HIGH`).
 
 ---
 
