@@ -418,6 +418,8 @@
 #define ADVANCED_OK  // ADDED: extend OK response with line number, planner space, and queue info
 #define SERIAL_OVERRUN_PROTECTION  // Throttle when serial buffer is full to prevent data loss
 #define FASTER_GCODE_PARSER  // Use a smaller, faster G-code parser
+#define PAREN_COMMENTS       // Support (comments in parentheses) — used by Simplify3D and some post-processors
+#define GCODE_QUOTED_STRINGS // Support quoted string parameters, e.g. M117 "message"
 
 //===========================================================================
 //====================== Auto-Reporting =====================================
@@ -510,6 +512,7 @@
 //#define MINIMUM_STEPPER_POST_DIR_DELAY 0
 
 // Fan control
+#define FAN_KICKSTART_TIME   100   // (ms) Spin fans up to full speed for this long before reducing to target PWM
 //#define FAN_SOFT_PWM
 //#define SOFT_PWM_SCALE 0
 
@@ -623,6 +626,9 @@
 //   ADVANCED_PAUSE_FEATURE + PARK_HEAD_ON_PAUSE + FILAMENT_LOAD_UNLOAD_GCODES
 //   CANCEL_OBJECTS
 //   GCODE_MACROS
+//   PAREN_COMMENTS
+//   GCODE_QUOTED_STRINGS
+//   FAN_KICKSTART_TIME 100
 //   EMERGENCY_PARSER
 //   SERIAL_FLOAT_PRECISION 4
 //   BUFSIZE 32

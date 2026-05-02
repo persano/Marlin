@@ -626,23 +626,23 @@
 /**
  * Filament Runout Sensor
  * ========================
- * NOT enabled by default.
- * WARNING: enabling without a physical sensor or with an incorrect pin will cause
- * the printer to pause / refuse every print. Verify the pin for your Ruby board first.
+ * PA0 (original Z-MIN endstop connector) repurposed as filament runout pin.
+ * Physical Z endstop is disconnected when BLTouch is installed; Z homing uses
+ * the BLTouch probe (PC2), so PA0 is free for the filament sensor.
+ * Confirmed by community guide for Artillery Sidewinder X2 (same Ruby board).
  *
- * To enable:
- *   1. Identify the runout pin in: Marlin/src/pins/stm32f4/pins_ARTILLERY_RUBY.h
- *   2. Uncomment the block below and set FIL_RUNOUT_PIN to the verified pin.
- *
- * //#define FILAMENT_RUNOUT_SENSOR
- * //#if ENABLED(FILAMENT_RUNOUT_SENSOR)
- * //  #define NUM_RUNOUT_SENSORS   1
- * //  #define FIL_RUNOUT_PIN  <VERIFIED_PIN>   // Check pins_ARTILLERY_RUBY.h
- * //  #define FIL_RUNOUT_STATE     LOW
- * //  #define FILAMENT_RUNOUT_SCRIPT "M600"
- * //  //#define FILAMENT_RUNOUT_DISTANCE_MM 25
- * //#endif
+ * FIL_RUNOUT_STATE LOW: pin is LOW when filament is absent (NC-type sensor with pullup).
+ * Trigger action: M600 (filament change / advanced pause).
  */
+#define FILAMENT_RUNOUT_SENSOR
+#if ENABLED(FILAMENT_RUNOUT_SENSOR)
+  #define NUM_RUNOUT_SENSORS   1
+  #define FIL_RUNOUT_PIN       PA0   // Z-MIN connector (original Z endstop, repurposed)
+  #define FIL_RUNOUT_STATE     LOW   // LOW = filament absent (NC sensor, internal pullup)
+  #define FIL_RUNOUT_PULLUP         // Use internal pullup on FIL_RUNOUT_PIN
+  #define FILAMENT_RUNOUT_SCRIPT "M600"
+  //#define FILAMENT_RUNOUT_DISTANCE_MM 7  // (mm) extrude this far before pausing; 0 = immediate
+#endif
 
 // @section extras
 
