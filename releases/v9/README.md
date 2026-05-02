@@ -60,6 +60,8 @@ The Genius Pro filament sensor is now enabled. When filament runs out, the print
 
 **Rewiring required:** the sensor is connected to the TFT board by default — Marlin cannot read it there. Unplug it from the TFT board and connect it to the **white connector on the left side of the printer, below the Z axis at the front** — this is the **PA0 (Z-MIN) pin** on the mainboard.
 
+For a visual guide on how to route the cable, follow this video from the timestamp: [YouTube — cable routing guide (9:26)](https://www.youtube.com/watch?v=WqoeYWdL-Hc&t=566s)
+
 The sensor is a switch: filament present = pin LOW; no filament = pin HIGH (runout triggered). Enable/disable and runout distance can be set at runtime with `M412`.
 
 **Fan kickstart (`FAN_KICKSTART_TIME 100`)**

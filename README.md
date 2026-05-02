@@ -143,6 +143,8 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 Unplug the filament sensor from the TFT board and connect it to the **white connector on the left side of the printer, below the Z axis at the front** — this is the PA0 (Z-MIN) input on the Artillery Ruby mainboard.
 
+For a visual guide on how to route the cable, follow this video from the timestamp: [YouTube — cable routing guide (9:26)](https://www.youtube.com/watch?v=WqoeYWdL-Hc&t=566s)
+
 **Why PA0:** once BLTouch is installed, Z homing is handled by the BLTouch probe on PC2, freeing the original Z endstop pin (PA0) for reuse as the filament sensor input.
 
 When filament runs out, the printer pauses and triggers `M600` (filament change). The sensor is a switch: filament present = switch closed = pin LOW; no filament = switch open = pin HIGH (runout triggered). Enable/disable and runout distance can be controlled at runtime with `M412`.
