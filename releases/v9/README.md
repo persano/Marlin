@@ -11,19 +11,47 @@ Built and tested on a physical Genius Pro unit. All configurations are hardware-
 If you just want to update your printer, use the pre-built binary — no compilation required.
 
 **File:** `firmware-gpro-v9-0x08000000.bin`  
-**Flash address:** `0x08000000`
+**Flash address:** `0x08000000`  
+**Tool required:** [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) (free, from ST)
 
 ### How to flash
 
-1. Copy `firmware-gpro-v9-0x08000000.bin` to the root of a microSD card (FAT32, ≤32 GB)
-2. Rename it to `firmware.bin` (some boards require this name)
-3. Power off the printer, insert the SD card into the **mainboard SD slot** (not the TFT slot)
-4. Power on — the LED on the board will blink while flashing (~10 seconds)
-5. Power cycle once flashing is complete
-6. Run `M502` followed by `M500` to reset and save EEPROM defaults
-7. Re-run your bed leveling (`G29`) and save (`M500`)
+#### 1. Install STM32CubeProgrammer
 
-> **Important:** after flashing, always do `M502` + `M500` before printing. Skipping this can cause unexpected behavior if old EEPROM data is incompatible.
+Download and install STM32CubeProgrammer from [st.com/stm32cubeprog](https://www.st.com/en/development-tools/stm32cubeprog.html). It runs on Windows, macOS, and Linux.
+
+#### 2. Enter DFU mode on the mainboard
+
+The board must be in DFU (Device Firmware Upgrade) mode before STM32CubeProgrammer can connect.
+
+1. Power off the printer.
+2. Locate the **BOOT** button on the Artillery Ruby mainboard.
+3. **Hold the BOOT button** and connect the USB cable from the mainboard to your PC.
+4. Release the BOOT button. The board is now in DFU mode (it will not power the motors or screen).
+
+> If your PC doesn't detect the device, try: hold BOOT, press and release RESET (while still holding BOOT), then release BOOT.
+
+#### 3. Flash with STM32CubeProgrammer
+
+1. Open STM32CubeProgrammer.
+2. In the connection panel (top right), select **USB** from the dropdown.
+3. Click the refresh button next to the port field — the DFU device should appear (e.g. `USB1`).
+4. Click **Connect**.
+5. In the left sidebar, click the **Erasing & Programming** icon (arrow pointing down into a chip).
+6. Under **File path**, browse to `firmware-gpro-v9-0x08000000.bin`.
+7. Set **Start address** to `0x08000000`.
+8. Check **Verify programming** (recommended).
+9. Click **Start Programming**.
+10. Wait for the "File download complete" confirmation.
+
+#### 4. Finish
+
+1. Click **Disconnect** in STM32CubeProgrammer.
+2. Unplug the USB cable.
+3. Power cycle the printer (off, then on).
+4. Send `M502` then `M500` from the terminal or TFT console to reset EEPROM to firmware defaults and save them.
+
+> **Important:** always run `M502` + `M500` after flashing. Old EEPROM data from a previous firmware version can cause erratic behavior.
 
 ---
 

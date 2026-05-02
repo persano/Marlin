@@ -165,29 +165,22 @@ When filament runs out, the printer pauses and triggers `M600` (filament change)
 
 ## How to Flash
 
-The Artillery Genius Pro uses **SD card flashing** — no USB cable, no drivers, no special software required.
+Flashing uses **STM32CubeProgrammer** over USB — download it free from [st.com/stm32cubeprog](https://www.st.com/en/development-tools/stm32cubeprog.html).
 
-### What you need
+### Quick steps
 
-- A microSD card (FAT32, ≤ 32 GB)
-- The `.bin` file from the Firmware Download section above
+1. **Install STM32CubeProgrammer** (Windows / macOS / Linux).
+2. **Enter DFU mode:** power off the printer, hold the **BOOT** button on the mainboard, connect USB to your PC, release BOOT.
+3. In STM32CubeProgrammer, select **USB** connection, refresh, and click **Connect**.
+4. Open the **Erasing & Programming** panel, set file to `firmware-gpro-v9-0x08000000.bin`, start address `0x08000000`, and click **Start Programming**.
+5. Disconnect, unplug USB, power cycle the printer.
+6. Send `M502` then `M500` to reset EEPROM to firmware defaults.
 
-### Steps
-
-1. Format the SD card as FAT32 (if not already).
-2. Copy `firmware-gpro-v9-0x08000000.bin` to the **root** of the SD card.
-3. Rename the file to **`firmware.bin`** — the bootloader looks for this exact name.
-4. Power off the printer.
-5. Insert the SD card into the **mainboard SD slot** — the small slot on the side of the control board, **not** the one on the TFT screen.
-6. Power on. The status LED on the board will blink rapidly for ~10 seconds while flashing.
-7. Once the LED stops blinking or the printer boots normally, power cycle.
-8. Send `M502` then `M500` from the terminal or TFT console to reset EEPROM to firmware defaults and save them.
-
-> **Important:** `M502` + `M500` after every flash. Old EEPROM data from a previous firmware version can cause erratic behavior.
+> **Important:** `M502` + `M500` after every flash — old EEPROM data from a previous version can cause erratic behavior.
 
 ### After flashing
 
-Re-run bed leveling — the mesh is stored in EEPROM and is not affected by `M502`, but it is good practice to re-verify after any firmware update:
+Re-run bed leveling after any firmware update:
 
 ```
 G28        ; home all axes
@@ -198,7 +191,7 @@ M420 S1    ; enable leveling
 M500       ; persist to EEPROM
 ```
 
-See [releases/v9/README.md](releases/v9/README.md) for the full post-flash calibration sequence including Linear Advance and Input Shaping.
+See [releases/v9/README.md](releases/v9/README.md) for the full step-by-step flash guide and post-flash calibration sequence.
 
 ## TFT Screen Firmware (Recommended)
 
