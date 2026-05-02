@@ -3,8 +3,8 @@
 Custom Marlin firmware for the **Artillery Genius Pro** (STM32F401RCT6, BOARD_ARTILLERY_RUBY).
 Hardware-verified configuration based on Marlin bugfix-2.1.x.
 
-**→ [Download pre-built firmware (v8)](releases/v8/firmware-gpro-v8-0x08000000.bin)**
-**→ [Flash instructions & build guide](releases/v8/README.md)**
+**→ [Download pre-built firmware (v9)](releases/v9/firmware-gpro-v9-0x08000000.bin)**
+**→ [Flash instructions & build guide](releases/v9/README.md)**
 **→ [Recommended: upgrade your TFT screen firmware](releases/tft/README.md)**
 
 ---
@@ -15,7 +15,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### Hardware / Board
 
-| Feature | Stock Marlin 2.1.x | gpro-mp | mfagp | Our v8 |
+| Feature | Stock Marlin 2.1.x | gpro-mp | mfagp | Our v9 |
 |---------|-------------------|---------|-------|--------|
 | Board | generic | `BOARD_ARTILLERY_RUBY` | `BOARD_ARTILLERY_RUBY` | `BOARD_ARTILLERY_RUBY` |
 | Dual serial (USB + TFT UART) | 1 port | 2 ports | 2 ports | 2 ports |
@@ -32,7 +32,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### G-code Commands
 
-| G-code | Purpose | Stock | gpro-mp | mfagp | Our v8 |
+| G-code | Purpose | Stock | gpro-mp | mfagp | Our v9 |
 |--------|---------|-------|---------|-------|--------|
 | M92 | Set steps-per-unit at runtime | no | **no** | yes | yes |
 | M113 | Host keepalive interval | no | no | yes | yes |
@@ -56,7 +56,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### Bed Leveling
 
-| Feature | Stock | gpro-mp | mfagp | Our v8 |
+| Feature | Stock | gpro-mp | mfagp | Our v9 |
 |---------|-------|---------|-------|--------|
 | Leveling method | bilinear | UBL | UBL | UBL |
 | Probe repetitions | 1 | 3 + 1 extra | 3 + 1 extra | 3 + 1 extra |
@@ -66,7 +66,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### Motion / Print Quality
 
-| Feature | Stock | gpro-mp | mfagp | Our v8 |
+| Feature | Stock | gpro-mp | mfagp | Our v9 |
 |---------|-------|---------|-------|--------|
 | S-curve acceleration | no | yes | yes | yes |
 | Junction Deviation | no | yes | yes | yes |
@@ -89,7 +89,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### Safety
 
-| Feature | Stock | gpro-mp | mfagp | Our v8 |
+| Feature | Stock | gpro-mp | mfagp | Our v9 |
 |---------|-------|---------|-------|--------|
 | Power loss recovery | no | yes | **no** | yes |
 | Thermal protection hotend | yes | yes | yes | yes |
@@ -100,7 +100,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### Serial / TFT Communication
 
-| Feature | Stock | gpro-mp | mfagp | Our v8 |
+| Feature | Stock | gpro-mp | mfagp | Our v9 |
 |---------|-------|---------|-------|--------|
 | BUFSIZE (command queue) | 4 | 32 | 32 | 32 |
 | TX_BUFFER_SIZE | 0 | 128 | 128 | 128 |
@@ -123,7 +123,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### SD Card / Storage
 
-| Feature | Stock | gpro-mp | mfagp | Our v8 |
+| Feature | Stock | gpro-mp | mfagp | Our v9 |
 |---------|-------|---------|-------|--------|
 | Long filename support | no | no | yes | yes |
 | Auto-report SD status (M27) | no | yes | yes | yes |
@@ -135,13 +135,31 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ---
 
+## Filament Runout Sensor — Wiring Required
+
+> **This requires a wiring change.** Without it the filament runout sensor will not work, even though it is enabled in the firmware.
+
+The Genius Pro filament sensor must be connected to the **Z endstop connector on the right side of the mainboard**, not to the stock connector on the left.
+
+**Why:** the right-side connector maps to pin **PA0** (the original Z-MIN endstop input). Once BLTouch is installed, Z homing is handled by the BLTouch probe on PC2, so PA0 is freed and repurposed here. The left-side Z endstop connector is a different pin and is unused in this build.
+
+**What to do:**
+
+1. Locate the two Z endstop connectors on the Artillery Ruby mainboard — one on the left side, one on the right side.
+2. Move the filament sensor cable to the **right-side connector**.
+3. Leave the stock Z endstop cable (left-side connector) disconnected.
+
+When filament runs out, the printer pauses and triggers `M600` (filament change). The sensor uses an internal pullup: LOW = no filament, HIGH = filament present. The runout distance and enable/disable can be controlled at runtime with `M412`.
+
+---
+
 ## Firmware Download
 
 | File | Description |
 |------|-------------|
-| [firmware-gpro-v8-0x08000000.bin](releases/v8/firmware-gpro-v8-0x08000000.bin) | Pre-built binary — flash at `0x08000000` |
-| [releases/v8/README.md](releases/v8/README.md) | Flash instructions, build guide, post-flash calibration |
-| [releases/v8/MERGE_REPORT.md](releases/v8/MERGE_REPORT.md) | Full audit log of every configuration decision |
+| [firmware-gpro-v9-0x08000000.bin](releases/v9/firmware-gpro-v9-0x08000000.bin) | Pre-built binary — flash at `0x08000000` |
+| [releases/v9/README.md](releases/v9/README.md) | Flash instructions, build guide, post-flash calibration |
+| [releases/v9/MERGE_REPORT.md](releases/v9/MERGE_REPORT.md) | Full audit log of every configuration decision |
 
 ## TFT Screen Firmware (Recommended)
 
@@ -187,6 +205,6 @@ Marlin firmware is licensed under [GPL v3](https://www.gnu.org/licenses/gpl-3.0.
 
 ## How It Looks
 
-With both the Marlin v8 firmware and the latest TFT firmware running, the info screen confirms the full setup — firmware version, capabilities, and screen chip all in one place.
+With both the Marlin v9 firmware and the latest TFT firmware running, the info screen confirms the full setup — firmware version, capabilities, and screen chip all in one place.
 
-![TFT info screen with v8 Marlin and latest TFT firmware](releases/tft/tft-info-screen.jpeg)
+![TFT info screen with v9 Marlin and latest TFT firmware](releases/tft/tft-info-screen.jpeg)
