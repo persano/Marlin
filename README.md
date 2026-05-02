@@ -165,19 +165,17 @@ When filament runs out, the printer pauses and triggers `M600` (filament change)
 
 ## How to Flash
 
-### What you need
-
-- A microSD card (FAT32, ≤ 32 GB)
-- A way to send a G-code command: the TFT screen terminal, or PC serial software (e.g. [Pronterface](https://www.pronterface.com/), OctoPrint) connected via USB at 250000 baud
+Flashing uses **[STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html)** over USB — download it free from ST (Windows / macOS / Linux).
 
 ### Quick steps
 
-1. Copy `firmware-gpro-v9-0x08000000.bin` to the root of the SD card and rename it to **`firmware.bin`**.
-2. Insert the SD card into the **mainboard SD slot** (not the TFT slot).
-3. Power on the printer.
-4. Send **`M997`** from the TFT terminal or your PC serial software.
-5. The printer flashes the firmware and reboots automatically.
-6. Send `M502` then `M500` to reset EEPROM to firmware defaults.
+1. **Install STM32CubeProgrammer.**
+2. Connect USB from the mainboard to your PC and power on the printer.
+3. **Enter DFU mode:** send `M997` from the TFT terminal or PC serial software (Pronterface, OctoPrint, etc.) at 250000 baud. The board reboots into DFU mode.
+4. In STM32CubeProgrammer, select **USB** connection, refresh, and click **Connect**.
+5. Open **Erasing & Programming**, set file to `firmware-gpro-v9-0x08000000.bin`, start address `0x08000000`, and click **Start Programming**.
+6. Disconnect, unplug USB, power cycle the printer.
+7. Send `M502` then `M500` to reset EEPROM to firmware defaults.
 
 > **Important:** `M502` + `M500` after every flash — old EEPROM data from a previous version can cause erratic behavior.
 
