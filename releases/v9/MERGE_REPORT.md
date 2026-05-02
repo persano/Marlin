@@ -39,9 +39,7 @@ The Artillery Genius Pro has a filament runout sensor. The pin used is **PA0** �
 
 **The filament sensor is connected to the TFT board by default, not the mainboard.** Marlin cannot read it from the TFT. The cable must be physically moved:
 
-1. Unplug the sensor cable from the connector on the **left side** of the gantry (near the top of the base).
-2. Route the cable down the **right side** of the gantry.
-3. Plug it into the connector on the right side — this is **PA0**, the original Z-MIN endstop pin, freed once BLTouch takes over Z homing via PC2.
+Unplug the sensor from the TFT board and connect it to the **white connector on the left side of the printer, below the Z axis at the front** — this is **PA0**, the original Z-MIN endstop pin, freed once BLTouch takes over Z homing via PC2.
 
 The sensor is a simple switch: filament present = switch closes to GND = pin LOW; no filament = switch open = pullup pulls pin HIGH = runout triggered (`FIL_RUNOUT_STATE HIGH`).
 

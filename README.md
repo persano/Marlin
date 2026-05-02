@@ -141,10 +141,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 **What to do:**
 
-1. The sensor cable runs up the **left side** of the gantry (when facing the front of the printer) and plugs into a connector near the top of the base, just under the bed.
-2. Unplug it from that connector and remove the cable runs securing it to the left side of the gantry.
-3. Run the cable down the **right side** of the gantry instead.
-4. Plug it into the exposed connector on the right side — this connects to the **PA0 (Z-MIN) pin** on the Artillery Ruby mainboard.
+Unplug the filament sensor from the TFT board and connect it to the **white connector on the left side of the printer, below the Z axis at the front** — this is the PA0 (Z-MIN) input on the Artillery Ruby mainboard.
 
 **Why PA0:** once BLTouch is installed, Z homing is handled by the BLTouch probe on PC2, freeing the original Z endstop pin (PA0) for reuse as the filament sensor input.
 

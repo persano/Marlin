@@ -58,11 +58,7 @@ The board will reboot into DFU mode and appear as a USB DFU device on your PC.
 
 The Genius Pro filament sensor is now enabled. When filament runs out, the printer pauses and triggers `M600` (filament change).
 
-**Rewiring required:** the sensor is connected to the TFT board by default — Marlin cannot read it there. Move the cable to the mainboard:
-
-1. Unplug the sensor cable from the connector near the top of the base on the **left side** of the gantry.
-2. Remove the cable runs securing it to the left side, then route the cable down the **right side** of the gantry.
-3. Plug it into the exposed connector on the right side — this is the **PA0 (Z-MIN) pin** on the mainboard.
+**Rewiring required:** the sensor is connected to the TFT board by default — Marlin cannot read it there. Unplug it from the TFT board and connect it to the **white connector on the left side of the printer, below the Z axis at the front** — this is the **PA0 (Z-MIN) pin** on the mainboard.
 
 The sensor is a switch: filament present = pin LOW; no filament = pin HIGH (runout triggered). Enable/disable and runout distance can be set at runtime with `M412`.
 
