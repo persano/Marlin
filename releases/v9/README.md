@@ -10,46 +10,39 @@ Built and tested on a physical Genius Pro unit. All configurations are hardware-
 
 If you just want to update your printer, use the pre-built binary — no compilation required.
 
-**File:** `firmware-gpro-v9-0x08000000.bin`  
-**Flash address:** `0x08000000`  
-**Tool required:** [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) (free, from ST)
+**File:** `firmware-gpro-v9-0x08000000.bin`
 
 ### How to flash
 
-#### 1. Install STM32CubeProgrammer
+#### 1. Prepare the SD card
 
-Download and install STM32CubeProgrammer from [st.com/stm32cubeprog](https://www.st.com/en/development-tools/stm32cubeprog.html). It runs on Windows, macOS, and Linux.
+1. Copy `firmware-gpro-v9-0x08000000.bin` to the root of a microSD card (FAT32, ≤ 32 GB).
+2. Rename it to **`firmware.bin`** — the bootloader looks for this exact name.
+3. Insert the SD card into the **mainboard SD slot** (the small slot on the side of the control board, not the TFT slot).
 
-#### 2. Enter DFU mode on the mainboard
+#### 2. Trigger the firmware update
 
-The board must be in DFU (Device Firmware Upgrade) mode before STM32CubeProgrammer can connect.
+Power on the printer, then send **`M997`** using one of these methods:
 
-1. Power off the printer.
-2. Locate the **BOOT** button on the Artillery Ruby mainboard.
-3. **Hold the BOOT button** and connect the USB cable from the mainboard to your PC.
-4. Release the BOOT button. The board is now in DFU mode (it will not power the motors or screen).
+**Option A — TFT screen terminal**
 
-> If your PC doesn't detect the device, try: hold BOOT, press and release RESET (while still holding BOOT), then release BOOT.
+Open the terminal on the TFT touchscreen and send:
+```
+M997
+```
 
-#### 3. Flash with STM32CubeProgrammer
+**Option B — PC serial software**
 
-1. Open STM32CubeProgrammer.
-2. In the connection panel (top right), select **USB** from the dropdown.
-3. Click the refresh button next to the port field — the DFU device should appear (e.g. `USB1`).
-4. Click **Connect**.
-5. In the left sidebar, click the **Erasing & Programming** icon (arrow pointing down into a chip).
-6. Under **File path**, browse to `firmware-gpro-v9-0x08000000.bin`.
-7. Set **Start address** to `0x08000000`.
-8. Check **Verify programming** (recommended).
-9. Click **Start Programming**.
-10. Wait for the "File download complete" confirmation.
+Connect a USB cable from the mainboard to your PC, open a serial terminal (e.g. [Pronterface](https://www.pronterface.com/), OctoPrint, or any serial monitor at 250000 baud), and send:
+```
+M997
+```
 
-#### 4. Finish
+#### 3. Finish
 
-1. Click **Disconnect** in STM32CubeProgrammer.
-2. Unplug the USB cable.
-3. Power cycle the printer (off, then on).
-4. Send `M502` then `M500` from the terminal or TFT console to reset EEPROM to firmware defaults and save them.
+The printer will detect `firmware.bin` on the SD card, flash it (the status LED will blink for a few seconds), and reboot automatically.
+
+Once it boots, send `M502` then `M500` to reset EEPROM to firmware defaults and save them.
 
 > **Important:** always run `M502` + `M500` after flashing. Old EEPROM data from a previous firmware version can cause erratic behavior.
 
