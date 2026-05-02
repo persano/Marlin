@@ -149,7 +149,7 @@ The Genius Pro filament sensor must be connected to the **Z endstop connector on
 2. Move the filament sensor cable to the **right-side connector**.
 3. Leave the stock Z endstop cable (left-side connector) disconnected.
 
-When filament runs out, the printer pauses and triggers `M600` (filament change). The sensor uses an internal pullup: LOW = no filament, HIGH = filament present. The runout distance and enable/disable can be controlled at runtime with `M412`.
+When filament runs out, the printer pauses and triggers `M600` (filament change). The sensor is NO (Normally Open): filament present = pin LOW; no filament = pin HIGH (runout triggered). The runout distance and enable/disable can be controlled at runtime with `M412`.
 
 ---
 

@@ -60,7 +60,7 @@ The Genius Pro filament sensor is now enabled. When filament runs out, the print
 
 **Wiring required:** connect the filament sensor to the **Z endstop connector on the right side of the mainboard** — not the stock Z endstop connector on the left. The right-side connector maps to pin PA0, which is freed when BLTouch is installed (Z homing is handled by the BLTouch probe on PC2, not the physical endstop). The stock Z endstop cable (left-side connector) should remain disconnected.
 
-The sensor uses an internal pullup: LOW = no filament, HIGH = filament present.
+The sensor is NO (Normally Open): filament present = pin LOW (circuit closed to GND); no filament = pin HIGH (circuit open, pullup pulls HIGH = runout triggered).
 
 **Fan kickstart (`FAN_KICKSTART_TIME 100`)**
 

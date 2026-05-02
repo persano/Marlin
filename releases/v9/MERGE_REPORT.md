@@ -29,7 +29,7 @@ The Artillery Genius Pro has a filament runout sensor. The pin used is **PA0** �
 | `FILAMENT_RUNOUT_SENSOR` | (gate) | Enables the feature |
 | `NUM_RUNOUT_SENSORS` | `1` | One sensor for one extruder |
 | `FIL_RUNOUT_PIN` | `PA0` | Z-MIN connector (original Z endstop, repurposed) |
-| `FIL_RUNOUT_STATE` | `LOW` | Pin is LOW when filament is absent (NC sensor + internal pullup) |
+| `FIL_RUNOUT_STATE` | `HIGH` | Pin is HIGH when filament is absent (NO sensor: pin floats HIGH via pullup when no filament) |
 | `FIL_RUNOUT_PULLUP` | (gate) | Internal pullup on FIL_RUNOUT_PIN |
 | `FILAMENT_RUNOUT_SCRIPT` | `"M600"` | Triggers Advanced Pause / filament change on runout |
 
@@ -39,7 +39,9 @@ The Artillery Genius Pro has a filament runout sensor. The pin used is **PA0** �
 
 Connect the filament sensor to the **Z endstop connector on the right side of the mainboard**, not the stock connector on the left. The right-side connector is PA0 — the original Z-MIN endstop pin, freed once BLTouch takes over Z homing. The stock Z endstop cable (left-side connector) should remain disconnected.
 
-PA0 is still listed as `Z_MIN_ENDSTOP_HIT_STATE LOW` in the config. Since BLTouch handles Z homing via PC2, the Z_MIN endstop is never actively checked during homing — a filament runout (LOW on PA0) would also read as "Z_MIN triggered", but this is harmless because it only occurs during a paused print, not during homing.
+The sensor is a NO (Normally Open) type: filament pressing the lever closes the circuit to GND (pin LOW = filament present); when no filament the lever is released, circuit opens, and the internal pullup pulls the pin HIGH. `FIL_RUNOUT_STATE HIGH` therefore means "trigger runout when pin is HIGH" — i.e., when no filament is present.
+
+PA0 is still listed as `Z_MIN_ENDSTOP_HIT_STATE LOW` in the config. Since BLTouch handles Z homing via PC2, the Z_MIN endstop is never actively checked during homing — this is harmless.
 
 ---
 
