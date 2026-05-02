@@ -35,9 +35,11 @@ The Artillery Genius Pro has a filament runout sensor. The pin used is **PA0** �
 
 `FILAMENT_RUNOUT_DISTANCE_MM` is left commented out (immediate pause on runout). Can be set at runtime with `M412 D<mm>` if a debounce distance is needed.
 
-### Pin note
+### Wiring note
 
-PA0 is still listed as `Z_MIN_ENDSTOP_HIT_STATE LOW` in the config. Since BLTouch handles Z homing (PC2), the Z_MIN endstop is never actively checked during homing — the only effect is that a filament runout (LOW on PA0) would also read as "Z_MIN triggered", which is harmless because it only occurs during a paused print, not during homing.
+Connect the filament sensor to the **Z endstop connector on the right side of the mainboard**, not the stock connector on the left. The right-side connector is PA0 — the original Z-MIN endstop pin, freed once BLTouch takes over Z homing. The stock Z endstop cable (left-side connector) should remain disconnected.
+
+PA0 is still listed as `Z_MIN_ENDSTOP_HIT_STATE LOW` in the config. Since BLTouch handles Z homing via PC2, the Z_MIN endstop is never actively checked during homing — a filament runout (LOW on PA0) would also read as "Z_MIN triggered", but this is harmless because it only occurs during a paused print, not during homing.
 
 ---
 

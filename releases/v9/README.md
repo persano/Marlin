@@ -31,9 +31,11 @@ If you just want to update your printer, use the pre-built binary — no compila
 
 **Filament Runout Sensor**
 
-The Genius Pro filament sensor is now enabled. It uses **PA0** — the original Z-MIN endstop connector, repurposed after BLTouch takes over Z homing. When filament runs out, the printer pauses and triggers `M600` (filament change).
+The Genius Pro filament sensor is now enabled. When filament runs out, the printer pauses and triggers `M600` (filament change).
 
-The sensor pin is active-LOW with internal pullup: LOW = no filament, HIGH = filament present. No wiring changes required beyond what is standard for a BLTouch install (Z endstop cable disconnected from the board; filament sensor connected to the same Z-MIN connector).
+**Wiring required:** connect the filament sensor to the **Z endstop connector on the right side of the mainboard** — not the stock Z endstop connector on the left. The right-side connector maps to pin PA0, which is freed when BLTouch is installed (Z homing is handled by the BLTouch probe on PC2, not the physical endstop). The stock Z endstop cable (left-side connector) should remain disconnected.
+
+The sensor uses an internal pullup: LOW = no filament, HIGH = filament present.
 
 **Fan kickstart (`FAN_KICKSTART_TIME 100`)**
 
