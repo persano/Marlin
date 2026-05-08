@@ -54,7 +54,7 @@ The board will reboot into DFU mode and appear as a USB DFU device on your PC.
 
 ## What's new in v10
 
-v10 is a build-optimization-only release — no features changed. The firmware is functionally identical to v9.
+v10 brings build-pipeline upgrades over v9 plus one runtime addition.
 
 **GCC 10.3.1 toolchain**
 
@@ -62,11 +62,15 @@ Upgraded from GCC 9.2.1 to GCC 10.3.1, which brings improved C++17 support, bett
 
 **Link-Time Optimization (`-flto`)**
 
-LTO allows the compiler to optimize across all compilation units at link time, eliminating dead code and inlining across module boundaries. Combined with the GCC 10.3.1 upgrade, this reduces flash usage by 15 KB (8.5%) compared to v9.
+LTO allows the compiler to optimize across all compilation units at link time, eliminating dead code and inlining across module boundaries. Combined with the GCC 10.3.1 upgrade, this reduces flash usage by ~14 KB (7.9%) compared to v9.
+
+**M575 — runtime baud-rate change**
+
+`BAUD_RATE_GCODE` is now enabled. Send `M575 B<baud>` (or `M575 P<port> B<baud>`) to switch the serial baud rate without reflashing. Accepted values: 2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000. Note: the change is **not** persisted — the next boot reverts to the compiled-in default (250000). Your sender must reconnect at the new baud immediately or comms will go silent.
 
 | Metric | v9 | v10 |
 |--------|----|-----|
-| Flash | 69.5% (182,216 B) | 63.6% (166,828 B) |
+| Flash | 69.5% (182,216 B) | 64.0% (167,692 B) |
 | RAM | 58.4% (38,260 B) | 58.4% (38,284 B) |
 
 ---
@@ -114,6 +118,7 @@ See [FEATURE_COMPARISON.md](../v9/FEATURE_COMPARISON.md) for a full side-by-side
 - **Power loss recovery** — resume after power failure
 - **M92** — set steps-per-unit at runtime
 - **M211** — toggle software endstops at runtime
+- **M575** — change serial baud rate at runtime *(added in v10)*
 - **M600** — filament change mid-print
 - **M486** — cancel individual objects mid-print
 - **M43** — pin debug and toggle (diagnostic tool)

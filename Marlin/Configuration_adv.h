@@ -392,6 +392,14 @@
  */
 #define SERIAL_FLOAT_PRECISION 4
 
+/**
+ * M575 - Change serial baud rate at runtime
+ * ADDED: per user request | REASON: lets host/TFT switch baud (e.g. 115200 ↔ 250000)
+ * without reflashing. Accepted bauds: 2400, 9600, 19200, 38400, 57600, 115200,
+ * 250000, 500000, 1000000 (also 24/96/19/38/57/115/250/500/1000 shortcut codes).
+ */
+#define BAUD_RATE_GCODE
+
 // @section buffers
 
 /**

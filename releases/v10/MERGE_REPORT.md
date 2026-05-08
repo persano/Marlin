@@ -1,14 +1,14 @@
 # Artillery Genius Pro — v10 Change Log
 
-**Previous release:** v9 (`firmware-gpro-v9-0x08000000.bin`)  
-**This release:** v10 (`firmware-gpro-v10-0x08000000.bin`)  
-**Date:** 2026-05-03  
+**Previous release:** v9 (`firmware-gpro-v9-0x08000000.bin`)
+**This release:** v10 (`firmware-gpro-v10-0x08000000.bin`)
+**Date:** 2026-05-08
 
 ---
 
 ## Summary
 
-v10 is a build-optimization-only release over v9. No features, motion, bed leveling, PID, serial, or hardware configuration settings were changed. The firmware is functionally identical to v9 — only the compiler toolchain and link-time optimization settings were updated, resulting in a 15 KB smaller binary.
+v10 brings two build-pipeline upgrades over v9 (GCC 10.3.1 toolchain and link-time optimization) plus one runtime addition (M575 — runtime baud-rate change). Net flash usage is ~14 KB smaller than v9.
 
 ---
 
@@ -20,7 +20,7 @@ v10 is a build-optimization-only release over v9. No features, motion, bed level
 
 ### Why
 
-LTO (Link-Time Optimization) defers optimization to the final link stage, allowing the compiler to eliminate dead code and inline functions across all compilation units. For a large codebase like Marlin, this typically yields a 5–15% flash size reduction with no runtime cost. The actual result for this build was a 9.4% reduction (−17,200 B) over the unoptimized v9 baseline.
+LTO (Link-Time Optimization) defers optimization to the final link stage, allowing the compiler to eliminate dead code and inline functions across all compilation units. For a large codebase like Marlin, this typically yields a 5–15% flash size reduction with no runtime cost.
 
 ---
 
@@ -38,11 +38,27 @@ The upgrade brings improved C++17 support, better optimizer heuristics, and bug 
 
 ---
 
+## Change 3: M575 — runtime baud-rate change
+
+### What changed
+
+`Marlin/Configuration_adv.h` — added `#define BAUD_RATE_GCODE` in the serial section.
+
+### Why
+
+Enables the M575 G-code so the host (or TFT) can switch the serial baud rate at runtime without reflashing. Useful when bringing up a different host stack or matching a TFT's preferred baud (e.g. 115200 vs the firmware default 250000).
+
+The change is not persisted to EEPROM — on every boot the firmware reverts to the compiled-in `BAUDRATE` from `Configuration.h`.
+
+Cost: +864 B flash (the M575 command handler).
+
+---
+
 ## Build result
 
-| Metric | v9 (GCC 9.2.1, no LTO) | v10 (GCC 10.3.1 + LTO) | Delta |
-|--------|------------------------|------------------------|-------|
-| Flash | 69.5% (182,216 B) | 63.6% (166,828 B) | −15,388 B (−8.5%) |
+| Metric | v9 (GCC 9.2.1, no LTO) | v10 (GCC 10.3.1 + LTO + M575) | Delta vs v9 |
+|--------|------------------------|-------------------------------|-------------|
+| Flash | 69.5% (182,216 B) | 64.0% (167,692 B) | −14,524 B (−7.9%) |
 | RAM | 58.4% (38,260 B) | 58.4% (38,284 B) | +24 B |
 
 ---
@@ -52,3 +68,4 @@ The upgrade brings improved C++17 support, better optimizer heuristics, and bug 
 | File | Change |
 |------|--------|
 | `ini/stm32f4.ini` | Add `-flto` and `platform_packages = toolchain-gccarmnoneeabi@1.100301.220327` to `[env:Artillery_Ruby]` |
+| `Marlin/Configuration_adv.h` | Add `#define BAUD_RATE_GCODE` in `@section serial` |
