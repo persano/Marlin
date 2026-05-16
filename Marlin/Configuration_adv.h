@@ -464,7 +464,11 @@
 // Auto-enable temperature reporting on boot so the TFT touchscreen gets live data
 // without requiring M155 S2 from slicer start G-code.
 // MarlinCore.cpp injects this into the command queue at the end of setup().
-#define STARTUP_COMMANDS "M155 S2"
+// v11 A/B: disabled — pre-arms temp auto-report before slicer start-gcode can run,
+// fires async chatter through the Beagle USB-CDC proxy and is the strongest single
+// suspect for the Resend-loop deadlock. TFT issues its own M155 S2 on connect via
+// SERIAL_PORT_2, so live temps on the touchscreen are unaffected.
+//#define STARTUP_COMMANDS "M155 S2"
 #define USE_WATCHDOG  // Hardware watchdog — resets if firmware hangs for >8s
 #define SLOWDOWN       // Slow down machine if look-ahead buffer is nearly full
 #define SLOWDOWN_DIVISOR 2
