@@ -429,21 +429,19 @@
 #define PAREN_COMMENTS       // Support (comments in parentheses) — used by Simplify3D and some post-processors
 #define GCODE_QUOTED_STRINGS // Support quoted string parameters, e.g. M117 "message"
 
-// v11 diagnostic — dormant in normal operation (zero steady-state chatter)
-// so it does not contaminate the Beagle A/B; only emits on explicit trigger.
+// v11 diagnostics — both dormant in normal operation (zero steady-state
+// chatter) so they do not contaminate the Beagle A/B; they only emit on
+// explicit trigger or MCU fault.
 #define DEBUG_FLAGS_GCODE    // Enable M111 runtime debug-mask handling. Marlin upstream
                              // emits a build warning when this is off ("Some hosts rely
                              // on it"). Output is gated by M111 Sn from the host — by
                              // default M111 is OFF, so nothing fires unless we ask for it.
-                             //
-                             // NOTE: POSTMORTEM_DEBUGGING was also tried here but is
-                             // incompatible with -flto (which this env enables): LTO
-                             // strips the naked-asm CommonHandler_ASM symbol because it
-                             // is only referenced from another inline-asm block in
-                             // HAL/STM32/MinSerial.cpp. Linker fails with
-                             // "undefined reference to CommonHandler_ASM". Backed out
-                             // because losing LTO would cost more flash budget than the
-                             // crash-dump diagnostic is worth right now.
+#define POSTMORTEM_DEBUGGING // On HardFault/UsageFault/MemManage/BusFault, dump CPU
+                             // registers + stack trace via MinSerial (HAL/STM32/
+                             // MinSerial.cpp). Only fires on MCU fault — silent in
+                             // normal operation. Tells us whether a future Beagle
+                             // deadlock is a soft-crash that USE_WATCHDOG is masking.
+                             // REQUIRES -flto disabled (see ini/stm32f4.ini comment).
 
 //===========================================================================
 //====================== Auto-Reporting =====================================
