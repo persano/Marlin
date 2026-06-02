@@ -162,7 +162,5 @@ Confirmed not at fault on this STM32 USB-CDC HAL: `SERIAL_XON_XOFF`. Although `C
 |---|---|
 | `Marlin/Configuration_adv.h` | Comment out `STARTUP_COMMANDS "M155 S2"`; add `DEBUG_FLAGS_GCODE` and `POSTMORTEM_DEBUGGING` |
 | `ini/stm32f4.ini` | Remove `-flto`, add `build_unflags = -flto`, remove `platform_packages` toolchain pin |
-| `BEAGLE_STUCK_PRINT_INVESTIGATION.md` | New — three-way config comparison and suspect ranking |
-| `BEAGLE_STUCK_PRINT_HANDOFF_PROMPT.md` | New — investigation handoff scope |
 | `releases/v11/` | New — `firmware-gpro-v11-0x08000000.bin`, `README.md`, this file |
 | 31 upstream commits | Cross-tree changes in motion/leveling/TMC/UI; none touching the host serial path |

@@ -2,7 +2,7 @@
 
 Custom Marlin firmware for the **Artillery Genius Pro** (STM32F401RCT6, BOARD_ARTILLERY_RUBY) based on Marlin bugfix-2.1.x.
 
-> **v11 is a diagnostic build**, not a feature release. It targets the Mintion Beagle USB-serial proxy stuck-print bug (`Resend: N<n>` infinite-loop deadlock when printing through the Beagle camera). See [MERGE_REPORT.md](MERGE_REPORT.md) for the full reasoning and `BEAGLE_STUCK_PRINT_INVESTIGATION.md` at the repo root for the upstream three-way config comparison.
+> **v11 is a diagnostic build**, not a feature release. It targets the Mintion Beagle USB-serial proxy stuck-print bug (`Resend: N<n>` infinite-loop deadlock when printing through the Beagle camera). See [MERGE_REPORT.md](MERGE_REPORT.md) for the full reasoning, including the three-way configuration comparison against stock Artillery and vanilla Marlin bugfix-2.1.x.
 
 ---
 
