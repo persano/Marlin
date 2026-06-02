@@ -1,5 +1,8 @@
 # Marlin bugfix-2.1.x — Artillery Genius Pro
 
+[![License: MIT](https://img.shields.io/badge/License-GPL3.0-blue.svg)](LICENSE)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/persano/Marlin)
+
 Custom Marlin firmware for the **Artillery Genius Pro** (STM32F401RCT6, BOARD_ARTILLERY_RUBY).
 Hardware-verified configuration based on Marlin bugfix-2.1.x.
 
