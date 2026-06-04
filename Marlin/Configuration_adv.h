@@ -620,7 +620,7 @@
   #endif
 
   // Core timing
-  #define FTM_BUFFER_SIZE  256   // (entries) Power of 2 required; 256 = 256 ms buffer at 1 kHz (was 128 — doubled for Beagle deadlock investigation, in case host-side stalls were starving the FT_MOTION planner)
+  #define FTM_BUFFER_SIZE  512   // (entries) Power of 2 required; 512 = 512 ms buffer at 1 kHz (was 128 upstream-default; first bumped to 256 in v12, then to 512 for safety margin during the Beagle deadlock investigation — any single host-side stall shorter than 512 ms can no longer underflow the planner)
   #define FTM_FS          1000   // (Hz) Trajectory generation rate
   #define FTM_MIN_SHAPE_FREQ  20 // (Hz) Minimum shaping frequency; lower values consume more RAM
 

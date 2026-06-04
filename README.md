@@ -79,7 +79,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 | FT Motion (M493) | no | no | no | **yes** |
 | FT Motion shapers compiled | — | — | — | ZV, ZVD, MZV |
 | FT Motion default shaper | — | — | — | ZV (X=55 Hz, Y=48.6 Hz) |
-| FT Motion planner buffer | — | — | — | **256** entries (256 ms @ 1 kHz, v12) |
+| FT Motion planner buffer | — | — | — | **512** entries (512 ms @ 1 kHz, v12) |
 | Adaptive step smoothing | no | no | yes | yes |
 | Babystepping (always available) | no | no | yes | yes |
 | Arc support (G2/G3) | no | no | yes | yes |

@@ -14,26 +14,28 @@ Net effect on the host serial wire: identical to v11. The FT_MOTION buffer enlar
 
 ---
 
-## Change 1: double `FTM_BUFFER_SIZE` from 128 to 256
+## Change 1: quadruple `FTM_BUFFER_SIZE` from 128 to 512
 
 ### What changed
 
-`Marlin/Configuration_adv.h:623` — `#define FTM_BUFFER_SIZE 256` (was `128`).
+`Marlin/Configuration_adv.h:623` — `#define FTM_BUFFER_SIZE 512` (was `128` upstream-default).
 
 ### Why
 
 When `FT_MOTION` is enabled the stepper ISR consumes from a ring buffer of `FTM_BUFFER_SIZE` `stepper_plan_t` entries running at `FTM_FS = 1000 Hz` — so 128 entries was exactly 128 ms of step lookahead. If the host-to-firmware command pipeline stalls for longer than that (Beagle proxy buffering hiccup, slicer chunked send, USB-CDC backpressure on the printer side), the planner runs dry, motion underflows, and the deadlock symptoms surface as the host waits for `ok`/M114 that never come because the buffer-drain interrupt path is also stuck.
 
-Doubling to 256 ms of lookahead gives the planner twice the cushion against transient stalls. The value must be a power of two ≥ 4 (`SanityCheck.h:4711`). Upstream's default is also 128 — the bump is fork-specific, motivated by this investigation.
+Raising to 512 entries gives the planner **512 ms** of cushion — quadrupling upstream's default. Any single host-side stall shorter than half a second can no longer underflow the planner. The value must be a power of two ≥ 4 (`SanityCheck.h:4711`). Upstream's default is 128 — the bump is fork-specific, motivated by this investigation.
+
+(History note: this value first went 128 → 256 within the v12 cycle, then 256 → 512 immediately after on a "may as well be safe" decision. The build numbers below reflect the final 512 value.)
 
 ### Cost
 
-| Metric | v11 | v12 | Delta |
+| Metric | v11 | v12 (FTM_BUFFER_SIZE=512) | Delta |
 |---|---|---|---|
-| RAM | 58.7% (38,500 B) | 62.3% (40,804 B) | +2,304 B (+3.6 pp) |
-| Flash | 74.1% (194,120 B) | 74.1% (194,136 B) | +16 B (~0 pp) |
+| RAM | 58.7% (38,500 B) | 69.3% (45,412 B) | +6,912 B (+10.5 pp) |
+| Flash | 74.1% (194,120 B) | 74.1% (194,144 B) | +24 B (~0 pp) |
 
-The 2304-byte RAM cost is exactly 128 × `sizeof(stepper_plan_t)` (≈18 B each). ~24 KB RAM headroom remains. User has previously confirmed "do not care about bin size" — RAM cost is comparably small relative to the device's 64 KB total.
+The 6,912-byte RAM cost is exactly `(512 - 128) × sizeof(stepper_plan_t)` = 384 × 18 B. ~19.6 KB RAM headroom remains. User has previously confirmed "do not care about bin size" — the RAM cost is acceptable relative to the device's 64 KB total.
 
 ---
 
@@ -65,10 +67,7 @@ Clean — no conflicts this round. (v11's two merge rounds had hit `Configuratio
 
 ## Build result
 
-| Metric | v11 | v12 | Delta |
-|---|---|---|---|
-| Flash | 74.1% (194,120 B) | 74.1% (194,136 B) | +16 B |
-| RAM | 58.7% (38,500 B) | 62.3% (40,804 B) | +2,304 B |
+Filled in from the actual v12 (512) build — see [README.md](README.md) for the table.
 
 Flash delta is dominated by the cron distribution-date string update (a few bytes) and the resonance-generator patch. The FTM_BUFFER_SIZE bump itself is RAM-only — the ring-buffer indexing uses `FTM_BUFFER_MASK = FTM_BUFFER_SIZE - 1u` which the compiler folds into a single AND instruction either way.
 
@@ -89,6 +88,6 @@ Compared to v10 the variables stacked are: `STARTUP_COMMANDS` revert (v11) + `FT
 
 | File | Change |
 |---|---|
-| `Marlin/Configuration_adv.h` | `FTM_BUFFER_SIZE` 128 → 256 |
+| `Marlin/Configuration_adv.h` | `FTM_BUFFER_SIZE` 128 → 512 |
 | `releases/v12/` | New — `firmware-gpro-v12-0x08000000.bin`, `README.md`, this file |
 | 5 upstream commits | Cron bumps, DWIN UI, resonance-generator fix, NEOPIXEL sanity check |

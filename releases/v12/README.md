@@ -2,7 +2,7 @@
 
 Custom Marlin firmware for the **Artillery Genius Pro** (STM32F401RCT6, BOARD_ARTILLERY_RUBY) based on Marlin bugfix-2.1.x.
 
-> **v12 is an incremental diagnostic build** over v11 in the ongoing Mintion Beagle USB-serial proxy stuck-print investigation. It doubles the FT_MOTION planner ring buffer (`FTM_BUFFER_SIZE` 128 → 256) on top of v11's protocol-content reverts, and syncs 5 additional upstream commits. See [MERGE_REPORT.md](MERGE_REPORT.md) for the full reasoning.
+> **v12 is an incremental diagnostic build** over v11 in the ongoing Mintion Beagle USB-serial proxy stuck-print investigation. It quadruples the FT_MOTION planner ring buffer (`FTM_BUFFER_SIZE` 128 → 512) on top of v11's protocol-content reverts, and syncs 5 additional upstream commits. See [MERGE_REPORT.md](MERGE_REPORT.md) for the full reasoning.
 
 ---
 
@@ -39,11 +39,11 @@ Download and install [STM32CubeProgrammer](https://www.st.com/en/development-too
 
 ## What's new in v12
 
-### 1. `FTM_BUFFER_SIZE` doubled — primary Beagle hypothesis being probed
+### 1. `FTM_BUFFER_SIZE` quadrupled — primary Beagle hypothesis being probed
 
-`Marlin/Configuration_adv.h:623` — `FTM_BUFFER_SIZE` raised from `128` to `256`.
+`Marlin/Configuration_adv.h:623` — `FTM_BUFFER_SIZE` raised from `128` to `512`.
 
-When FT_MOTION is enabled the stepper ISR consumes from a ring buffer of `stepper_plan_t` entries at `FTM_FS = 1000 Hz`. So 128 entries was 128 ms of step lookahead — short enough that a brief host-pipeline stall (Beagle proxy internal buffering, USB-CDC backpressure, slicer chunked send) could drain it and cause motion underflow. With 256 entries the planner has 256 ms of cushion.
+When FT_MOTION is enabled the stepper ISR consumes from a ring buffer of `stepper_plan_t` entries at `FTM_FS = 1000 Hz`. So 128 entries was 128 ms of step lookahead — short enough that a brief host-pipeline stall (Beagle proxy internal buffering, USB-CDC backpressure, slicer chunked send) could drain it and cause motion underflow. With 512 entries the planner has **512 ms of cushion** — any single host-side stall shorter than half a second can no longer underflow it.
 
 This is the new variable being tested in the deadlock investigation. All v11 reverts remain in place.
 
@@ -63,10 +63,10 @@ None touch HAL/STM32, usb_serial, the host-action emitters, the auto-report time
 
 | | v11 | v12 |
 |---|---|---|
-| Flash | 74.1% (194,120 B) | 74.1% (194,136 B) |
-| RAM | 58.7% (38,500 B) | 62.3% (40,804 B) |
+| Flash | 74.1% (194,120 B) | 74.1% (194,144 B) |
+| RAM | 58.7% (38,500 B) | 69.3% (45,412 B) |
 
-The +2,304 B RAM cost is exactly `128 × sizeof(stepper_plan_t)`. ~24 KB RAM headroom remains.
+The +6,912 B RAM cost is exactly `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B. ~19.6 KB RAM headroom remains.
 
 ---
 
@@ -91,7 +91,7 @@ All v10 features are retained:
 - **Fan kickstart** — 100 ms full-power burst on fan startup
 - **G-code parser compatibility** — `PAREN_COMMENTS`, `GCODE_QUOTED_STRINGS`
 - **Temperature reporting to TFT during host-controlled preheat**
-- **FT Motion** (M493) — ZV/ZVD/MZV input shaping with **256-entry planner buffer** (v12)
+- **FT Motion** (M493) — ZV/ZVD/MZV input shaping with **512-entry planner buffer** (v12)
 - **BLTouch** with correct dual-pin wiring for the Ruby board
 - **Unified Bed Leveling (UBL)** with Hilbert-curve scan and G26 mesh test
 - **Linear Advance** (K = 0.13 default for direct drive)
@@ -110,7 +110,7 @@ All v10 features are retained:
 3. Outcome interpretation:
    - **v12 clean, v11 deadlocks:** the FT_MOTION buffer cushion is the cure — the root cause has a planner-underflow component, host pipeline stalls were running the 128 ms buffer dry. Investigation focus shifts away from chatty async messages and toward what is throttling command delivery (Beagle internal buffering, USB-CDC backpressure, slicer chunked-send timing).
    - **Both v12 and v11 clean:** v11's `STARTUP_COMMANDS` revert was already the cure; v12 piles on the buffer bump but the difference is invisible without an A/B against the deadlocking baseline.
-   - **v12 still deadlocks:** the buffer cushion was insufficient. Either the host-pipeline stall is longer than 256 ms, or the root cause is unrelated to planner underflow. Revisit MERGE_REPORT.md ranking.
+   - **v12 still deadlocks:** the buffer cushion was insufficient. Either the host-pipeline stall is longer than 512 ms (unlikely for a transient buffering hiccup), or the root cause is unrelated to planner underflow. Revisit MERGE_REPORT.md ranking.
 
 ### Capture a faulting MCU
 
