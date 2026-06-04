@@ -6,8 +6,8 @@
 Custom Marlin firmware for the **Artillery Genius Pro** (STM32F401RCT6, BOARD_ARTILLERY_RUBY).
 Hardware-verified configuration based on Marlin bugfix-2.1.x.
 
-**→ [Download pre-built firmware (v11)](releases/v11/firmware-gpro-v11-0x08000000.bin)**
-**→ [Flash instructions & build guide](releases/v11/README.md)**
+**→ [Download pre-built firmware (v12)](releases/v12/firmware-gpro-v12-0x08000000.bin)**
+**→ [Flash instructions & build guide](releases/v12/README.md)**
 **→ [Recommended: upgrade your TFT screen firmware](releases/tft/README.md)**
 
 ---
@@ -18,7 +18,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### Hardware / Board
 
-| Feature | Stock Marlin 2.1.x | gpro-mp | mfagp | Our v11 |
+| Feature | Stock Marlin 2.1.x | gpro-mp | mfagp | Our v12 |
 |---------|-------------------|---------|-------|--------|
 | Board | generic | `BOARD_ARTILLERY_RUBY` | `BOARD_ARTILLERY_RUBY` | `BOARD_ARTILLERY_RUBY` |
 | Dual serial (USB + TFT UART) | 1 port | 2 ports | 2 ports | 2 ports |
@@ -35,7 +35,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### G-code Commands
 
-| G-code | Purpose | Stock | gpro-mp | mfagp | Our v11 |
+| G-code | Purpose | Stock | gpro-mp | mfagp | Our v12 |
 |--------|---------|-------|---------|-------|--------|
 | M92 | Set steps-per-unit at runtime | no | **no** | yes | yes |
 | M113 | Host keepalive interval | no | no | yes | yes |
@@ -59,7 +59,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### Bed Leveling
 
-| Feature | Stock | gpro-mp | mfagp | Our v11 |
+| Feature | Stock | gpro-mp | mfagp | Our v12 |
 |---------|-------|---------|-------|--------|
 | Leveling method | bilinear | UBL | UBL | UBL |
 | Probe repetitions | 1 | 3 + 1 extra | 3 + 1 extra | 3 + 1 extra |
@@ -69,7 +69,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### Motion / Print Quality
 
-| Feature | Stock | gpro-mp | mfagp | Our v11 |
+| Feature | Stock | gpro-mp | mfagp | Our v12 |
 |---------|-------|---------|-------|--------|
 | S-curve acceleration | no | yes | yes | yes |
 | Junction Deviation | no | yes | yes | yes |
@@ -79,6 +79,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 | FT Motion (M493) | no | no | no | **yes** |
 | FT Motion shapers compiled | — | — | — | ZV, ZVD, MZV |
 | FT Motion default shaper | — | — | — | ZV (X=55 Hz, Y=48.6 Hz) |
+| FT Motion planner buffer | — | — | — | **256** entries (256 ms @ 1 kHz, v12) |
 | Adaptive step smoothing | no | no | yes | yes |
 | Babystepping (always available) | no | no | yes | yes |
 | Arc support (G2/G3) | no | no | yes | yes |
@@ -92,7 +93,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### Safety
 
-| Feature | Stock | gpro-mp | mfagp | Our v11 |
+| Feature | Stock | gpro-mp | mfagp | Our v12 |
 |---------|-------|---------|-------|--------|
 | Power loss recovery | no | yes | **no** | yes |
 | Thermal protection hotend | yes | yes | yes | yes |
@@ -103,7 +104,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### Serial / TFT Communication
 
-| Feature | Stock | gpro-mp | mfagp | Our v11 |
+| Feature | Stock | gpro-mp | mfagp | Our v12 |
 |---------|-------|---------|-------|--------|
 | BUFSIZE (command queue) | 4 | 32 | 32 | 32 |
 | TX_BUFFER_SIZE | 0 | 128 | 128 | 128 |
@@ -126,7 +127,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 
 ### SD Card / Storage
 
-| Feature | Stock | gpro-mp | mfagp | Our v11 |
+| Feature | Stock | gpro-mp | mfagp | Our v12 |
 |---------|-------|---------|-------|--------|
 | Long filename support | no | no | yes | yes |
 | Auto-report SD status (M27) | no | yes | yes | yes |
@@ -158,10 +159,11 @@ When filament runs out, the printer pauses and triggers `M600` (filament change)
 
 | File | Description |
 |------|-------------|
-| [firmware-gpro-v11-0x08000000.bin](releases/v11/firmware-gpro-v11-0x08000000.bin) | Pre-built binary — flash at `0x08000000` |
-| [releases/v11/README.md](releases/v11/README.md) | Flash instructions, build guide, post-flash calibration |
-| [releases/v11/MERGE_REPORT.md](releases/v11/MERGE_REPORT.md) | Change log from v10 to v11 |
-| [firmware-gpro-v10-0x08000000.bin](releases/v10/firmware-gpro-v10-0x08000000.bin) | Previous release (v10) — fallback if v11 misbehaves |
+| [firmware-gpro-v12-0x08000000.bin](releases/v12/firmware-gpro-v12-0x08000000.bin) | Pre-built binary — flash at `0x08000000` |
+| [releases/v12/README.md](releases/v12/README.md) | Flash instructions, build guide, post-flash calibration |
+| [releases/v12/MERGE_REPORT.md](releases/v12/MERGE_REPORT.md) | Change log from v11 to v12 |
+| [firmware-gpro-v11-0x08000000.bin](releases/v11/firmware-gpro-v11-0x08000000.bin) | Previous release (v11) — fallback if v12 misbehaves |
+| [firmware-gpro-v10-0x08000000.bin](releases/v10/firmware-gpro-v10-0x08000000.bin) | Older release (v10) — second-line fallback |
 
 ---
 
@@ -175,7 +177,7 @@ Flashing uses **[STM32CubeProgrammer](https://www.st.com/en/development-tools/st
 2. Connect USB from the mainboard to your PC and power on the printer.
 3. **Enter DFU mode:** send `M997` from the TFT terminal or PC serial software (Pronterface, OctoPrint, etc.) at 250000 baud. The board reboots into DFU mode.
 4. In STM32CubeProgrammer, select **USB** connection, refresh, and click **Connect**.
-5. Open **Erasing & Programming**, set file to `firmware-gpro-v11-0x08000000.bin`, start address `0x08000000`, and click **Start Programming**.
+5. Open **Erasing & Programming**, set file to `firmware-gpro-v12-0x08000000.bin`, start address `0x08000000`, and click **Start Programming**.
 6. Disconnect, unplug USB, power cycle the printer.
 7. Send `M502` then `M500` to reset EEPROM to firmware defaults.
 
@@ -194,7 +196,7 @@ M420 S1    ; enable leveling
 M500       ; persist to EEPROM
 ```
 
-See [releases/v11/README.md](releases/v11/README.md) for the full step-by-step flash guide and post-flash calibration sequence.
+See [releases/v12/README.md](releases/v12/README.md) for the full step-by-step flash guide and post-flash calibration sequence.
 
 ## TFT Screen Firmware (Recommended)
 
@@ -240,6 +242,6 @@ Marlin firmware is licensed under [GPL v3](https://www.gnu.org/licenses/gpl-3.0.
 
 ## How It Looks
 
-With this Marlin build and the latest TFT firmware running, the info screen confirms the full setup — firmware version, capabilities, and screen chip all in one place. (Screenshot captured with v10; v11 displays the same screen with its own version string.)
+With this Marlin build and the latest TFT firmware running, the info screen confirms the full setup — firmware version, capabilities, and screen chip all in one place. (Screenshot captured with v10; v12 displays the same screen with its own version string.)
 
 ![TFT info screen showing Marlin firmware version, capabilities, and screen chip](releases/tft/tft-info-screen.jpeg)
