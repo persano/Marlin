@@ -39,6 +39,18 @@ Download and install [STM32CubeProgrammer](https://www.st.com/en/development-too
 
 ## What's new in v12
 
+### 0. Hotend Extruder Auto-Fan enabled — **safety fix** (regression vs stock Artillery)
+
+`Marlin/Configuration_adv.h` — new block:
+
+```cpp
+#define E0_AUTO_FAN_PIN              PC7   // FAN1 on Ruby = hotend heatsink fan
+#define EXTRUDER_AUTO_FAN_TEMPERATURE 50
+#define EXTRUDER_AUTO_FAN_SPEED      255
+```
+
+The fork's slimmed `Configuration_adv.h` had never carried the auto-fan block, so the hotend heatsink fan on PC7 was unmanaged — it would only run if the user manually sent `M106 P1 S255`. Without it, heat creeps up the heatbreak during a print and clogs the cold end. With this fix the firmware drives PC7 at full speed whenever the hotend reads ≥ 50 °C and turns it off below — no host commands required. Treat FAN1 as fully automatic from now on.
+
 ### 1. `FTM_BUFFER_SIZE` quadrupled — primary Beagle hypothesis being probed
 
 `Marlin/Configuration_adv.h:623` — `FTM_BUFFER_SIZE` raised from `128` to `512`.
@@ -63,10 +75,10 @@ None touch HAL/STM32, usb_serial, the host-action emitters, the auto-report time
 
 | | v11 | v12 |
 |---|---|---|
-| Flash | 74.1% (194,120 B) | 74.1% (194,144 B) |
-| RAM | 58.7% (38,500 B) | 69.3% (45,412 B) |
+| Flash | 74.1% (194,120 B) | 74.1% (194,288 B) |
+| RAM | 58.7% (38,500 B) | 69.3% (45,416 B) |
 
-The +6,912 B RAM cost is exactly `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B. ~19.6 KB RAM headroom remains.
+The +6,916 B RAM cost is dominated by `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B for the FT_MOTION ring; the auto-fan handler adds only a couple of bytes. Flash +168 B vs v11. ~19.6 KB RAM headroom remains.
 
 ---
 

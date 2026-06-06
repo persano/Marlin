@@ -88,6 +88,37 @@ Compared to v10 the variables stacked are: `STARTUP_COMMANDS` revert (v11) + `FT
 
 | File | Change |
 |---|---|
-| `Marlin/Configuration_adv.h` | `FTM_BUFFER_SIZE` 128 → 512 |
+| `Marlin/Configuration_adv.h` | `FTM_BUFFER_SIZE` 128 → 512; **new auto-fan block** (`E0_AUTO_FAN_PIN = PC7`) |
 | `releases/v12/` | New — `firmware-gpro-v12-0x08000000.bin`, `README.md`, this file |
 | 5 upstream commits | Cron bumps, DWIN UI, resonance-generator fix, NEOPIXEL sanity check |
+
+---
+
+## Change 3: enable Extruder Auto-Fan on `E0_AUTO_FAN_PIN = PC7` (FAN1)
+
+### What changed
+
+`Marlin/Configuration_adv.h` — new block in Thermal Settings:
+
+```cpp
+#define E0_AUTO_FAN_PIN              PC7   // FAN1 on Ruby = hotend heatsink fan
+#define EXTRUDER_AUTO_FAN_TEMPERATURE 50
+#define EXTRUDER_AUTO_FAN_SPEED      255
+```
+
+### Why
+
+This was a **silent omission** in the fork's slimmed Configuration_adv.h that caused real hardware damage: the hotend heatsink fan on `FAN1_PIN = PC7` had no auto-management, so heat crept up the heatbreak during printing and clogged the cold end. The user had to manually issue `M106 P1 S255` every session to drive the fan.
+
+With the new block, the firmware unconditionally drives PC7 at full speed whenever the hotend reads ≥ 50 °C and turns it off below that — the standard Marlin extruder-auto-fan behavior that stock Artillery firmware ships with. No host commands required.
+
+Note: M106 P1 will still nominally address PC7, but the auto-fan handler runs every ~2.5 s on temperature updates and will override any manual setting — treat FAN1 as fully automatic now.
+
+### Cost
+
+| Metric | v11 | v12 (final) | Delta |
+|---|---|---|---|
+| Flash | 74.1% (194,120 B) | 74.1% (194,288 B) | +168 B |
+| RAM | 58.7% (38,500 B) | 69.3% (45,416 B) | +6,916 B |
+
+Flash delta is +144 B vs the FTM_BUFFER_SIZE=512 pre-fix build, all attributable to the auto-fan handler code path. RAM delta is unchanged from the 512 build (auto-fan state is a couple of bytes that the linker fits into existing alignment slack).

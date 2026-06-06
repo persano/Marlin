@@ -31,6 +31,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 | Calibrated PID hotend | generic | hardware-tuned | generic defaults | hardware-tuned |
 | Calibrated PID bed | generic | hardware-tuned | generic defaults | hardware-tuned |
 | Controller fan auto-management | no | no | yes | no |
+| Hotend heatsink auto-fan | yes | yes | yes | **yes** (FAN1 / PC7 @ ≥ 50 °C, v12) |
 | NeoPixel RGB LED | no | no | yes | no |
 
 ### G-code Commands

@@ -46,6 +46,35 @@
 #define TEMP_BED_WINDOW          1   // (°C) Temperature proximity for the "ready" timer
 #define TEMP_BED_HYSTERESIS      3   // (°C) Temperature proximity considered "close enough" to the target
 
+/**
+ * Extruder Auto-Fan (hotend heatsink fan)
+ *
+ * Critical for hotend safety: the heatsink fan (NOT the part-cooling fan) must run
+ * any time the hotend is hot, otherwise heat creeps up the heatbreak and clogs the
+ * filament path inside the cold end — exactly the symptom that surfaced this fix
+ * (had to run `M106 P1 S255` manually to drive the fan; missing it caused a clog).
+ *
+ * Hardware on Artillery Ruby (per pins_ARTILLERY_RUBY.h):
+ *   - FAN0_PIN PC8  = part cooling (M106 P0 / default M106)
+ *   - FAN1_PIN PC7  = hotend heatsink fan        <-- this becomes the auto-fan
+ *
+ * Behavior with this config: when hotend ≥ 50 °C the firmware drives PC7 at full
+ * speed every ~2.5 s temperature update; below 50 °C the fan is off. No M106
+ * needed from the host. Stock Artillery firmware had this; our fork's slimmed
+ * Configuration_adv.h had dropped the block.
+ *
+ * Note: M106 P1 will still nominally address the same physical pin, but the
+ * auto-fan handler runs on every temperature update and will override any
+ * manual setting — treat the fan as fully automatic.
+ */
+#define E0_AUTO_FAN_PIN              PC7   // FAN1 on Ruby = hotend heatsink fan
+#define EXTRUDER_AUTO_FAN_TEMPERATURE 50   // (°C) Turn on the auto fans at this temp
+#define EXTRUDER_AUTO_FAN_SPEED      255   // 255 = full speed (PC7 is PWM-capable; sanity check requires this)
+#define CHAMBER_AUTO_FAN_TEMPERATURE  30   // (°C) — unused (no chamber fan defined), kept at default for completeness
+#define CHAMBER_AUTO_FAN_SPEED       255   // 255 = full speed
+#define COOLER_AUTO_FAN_TEMPERATURE   18   // (°C) — unused (no laser cooler)
+#define COOLER_AUTO_FAN_SPEED        255
+
 //===========================================================================
 //==================== Z Steppers & Tramming ================================
 //===========================================================================
