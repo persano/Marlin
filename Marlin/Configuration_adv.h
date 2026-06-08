@@ -76,6 +76,26 @@
 #define COOLER_AUTO_FAN_SPEED        255
 
 /**
+ * Part-Cooling Fan minimum PWM
+ *
+ * Below ~20% PWM (50/255) the small worn part-cooling fans common on the
+ * Artillery hotend assembly will stall instead of spinning slowly — slicer
+ * commands like `M106 S40` become silently 0% cooling rather than "low"
+ * cooling, producing stringing/blob defects that read as a slicer bug.
+ *
+ * With FAN_MIN_PWM=50 the firmware remaps the requested M106 range so the
+ * minimum non-zero value sent to the FET is 50/255. `M106 S0` still means
+ * fan off (CALC_FAN_SPEED preserves the OFF case explicitly).
+ *
+ * Precedent: enabled with the same value in the user's Sidewinder X2 fork
+ * (`marlins/custom fw - sidewinder x2/.../Configuration_adv.h:582`). The
+ * stock Genius Pro forks (and gpro-mp / mfagp) leave it commented out.
+ * Carried into this fork because Genius Pro and X2 share the fan family
+ * and the X2 was tuned by community for the same stall behavior.
+ */
+#define FAN_MIN_PWM  50   // (0-255) Minimum PWM sent to non-zero fan speeds
+
+/**
  * Thermal Runaway — heating-ramp watch
  *
  * Configuration.h enables THERMAL_PROTECTION_HOTENDS / _BED and sets

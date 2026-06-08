@@ -152,6 +152,47 @@ None touch HAL/STM32, usb_serial, thermal, or motion. Merge required `--ours` re
 
 ---
 
+## Change 7: enable `FAN_MIN_PWM 50` — part-cooling-fan stall mitigation
+
+### What changed
+
+`Marlin/Configuration_adv.h` — added in the fan block:
+
+```cpp
+#define FAN_MIN_PWM  50   // (0-255) Minimum PWM sent to non-zero fan speeds
+```
+
+### Why
+
+Below ~20 % PWM (50/255) the small worn part-cooling fans common on the Artillery hotend assembly stall instead of spinning slowly. Slicer commands like `M106 S40` become silently 0 % cooling rather than "low" cooling, producing stringing and blob defects that read as a slicer bug.
+
+With `FAN_MIN_PWM = 50` the firmware remaps the requested M106 range so the minimum non-zero PWM sent to the FET is 50/255. `M106 S0` still means fan off — `CALC_FAN_SPEED` preserves the off case explicitly (`Conditionals-5-post.h:3000`).
+
+### Precedent
+
+Surveyed five sibling Marlin forks in this project's `marlins/` tree:
+
+| Fork | `FAN_MIN_PWM` |
+|---|---|
+| stock Genius Pro | commented |
+| stock Genius Pro all-metal | commented |
+| gpro-mp (custom Genius Pro) | commented |
+| mfagp (custom Genius Pro) | commented |
+| **Sidewinder X2 (`Marlin-lts-2.1.2-swx2`)** | **enabled, value 50** |
+
+The X2 fork was tuned by the community for the same fan stall pattern. Same hotend fan family on the Genius Pro, so the carry-over is justified. The same survey covered `SD_ABORT_ON_ENDSTOP_HIT` and `HOMING_BACKOFF_POST_MM` — neither is enabled in any sibling fork, so the v12 audit's skip decisions stand for those two.
+
+### Cost
+
+| Metric | pre-fix v12 | post-fix v12 | Delta |
+|---|---|---|---|
+| Flash | 74.4% (195,064 B) | 74.4% (195,104 B) | +40 B |
+| RAM | 69.3% (45,432 B) | 69.3% (45,432 B) | 0 B |
+
+The +40 B Flash is `CALC_FAN_SPEED` switching from its early-out form to the `map(f, 1, 255, FAN_MIN_PWM, FAN_MAX_PWM)` form per the `Conditionals-5-post.h:3000-3003` branch — auditable evidence the remap path is now compiled in.
+
+---
+
 ## Change 6: fix stale internal docstring on filament-runout sensor
 
 `Marlin/Configuration.h:634` block-comment used to say `FIL_RUNOUT_STATE LOW: pin is LOW when filament is absent` while the actual define on line 641 sets `FIL_RUNOUT_STATE HIGH`. The actual setting is correct given the user's documented wiring (switch closes to GND when filament present, pullup pulls HIGH when absent). Only the stale docstring was wrong — no behavior change, but a cross-AI audit flagged it as a likely contradiction and the comment was sweeping confusion across future reviews. Updated to match.

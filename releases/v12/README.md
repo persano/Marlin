@@ -39,6 +39,14 @@ Download and install [STM32CubeProgrammer](https://www.st.com/en/development-too
 
 ## What's new in v12
 
+### -2. `FAN_MIN_PWM 50` — part-cooling fan stall mitigation
+
+`Marlin/Configuration_adv.h` — `#define FAN_MIN_PWM 50` added.
+
+Below ~20 % PWM (50/255) Artillery's small part-cooling fans tend to stall. With this set, the firmware remaps M106 so the smallest non-zero PWM that ever reaches the FET is 50/255, eliminating silent "cooling on but actually 0 %" failures at low speeds. `M106 S0` is preserved as fully-off.
+
+Precedent: enabled with the same value in the user's Sidewinder X2 fork; same fan family on Genius Pro. The stock Genius Pro forks (and gpro-mp / mfagp) all leave it commented out.
+
 ### -1. Thermal Runaway heating-ramp watch enabled — **safety fix** (silent regression)
 
 `Marlin/Configuration_adv.h` — added:
@@ -88,10 +96,10 @@ None touch HAL/STM32, usb_serial, the host-action emitters, the auto-report time
 
 | | v11 | v12 (current) |
 |---|---|---|
-| Flash | 74.1% (194,120 B) | 74.4% (195,064 B) |
+| Flash | 74.1% (194,120 B) | 74.4% (195,104 B) |
 | RAM | 58.7% (38,500 B) | 69.3% (45,432 B) |
 
-The +6,932 B RAM cost is dominated by `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B for the FT_MOTION ring; the auto-fan handler and `HeaterWatch` state together add a few dozen bytes. Flash +944 B vs v11 (auto-fan handler + thermal-ramp watch code paths now compiled in). ~19.6 KB RAM headroom remains.
+The +6,932 B RAM cost is dominated by `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B for the FT_MOTION ring; the auto-fan handler and `HeaterWatch` state together add a few dozen bytes. Flash +984 B vs v11 (auto-fan handler + thermal-ramp watch + FAN_MIN_PWM remap code paths now compiled in). ~19.6 KB RAM headroom remains.
 
 ---
 
