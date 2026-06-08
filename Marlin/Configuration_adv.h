@@ -75,6 +75,34 @@
 #define COOLER_AUTO_FAN_TEMPERATURE   18   // (°C) — unused (no laser cooler)
 #define COOLER_AUTO_FAN_SPEED        255
 
+/**
+ * Thermal Runaway — heating-ramp watch
+ *
+ * Configuration.h enables THERMAL_PROTECTION_HOTENDS / _BED and sets
+ * THERMAL_PROTECTION_PERIOD + _HYSTERESIS. Those guard *steady-state* drift
+ * after the heater reaches target.
+ *
+ * The block below guards the **ramp-up window**, when the host commands the
+ * heater on but it hasn't reached target yet. Without WATCH_TEMP_PERIOD the
+ * Conditionals macro silently disables WATCH_HOTENDS via the test
+ * `THERMAL_PROTECTION_HOTENDS && WATCH_TEMP_PERIOD > 0` — an undefined macro
+ * evaluates to 0 in `#if`, so a dead heater (open thermistor, broken
+ * heater cartridge, stuck MOSFET) would be undetected during heat-up.
+ *
+ * This was the second occurrence of a slim-config safety regression after
+ * the E0_AUTO_FAN_PIN miss. Verified by reading Conditionals-5-post.h:2732
+ * and confirming no prior WATCH_TEMP_* define existed anywhere in Marlin/.
+ *
+ * Values are Marlin upstream's recommended defaults:
+ *   - If the hotend doesn't rise by ≥ 2 °C within 40 s of being commanded, fault.
+ *   - If the bed doesn't rise by ≥ 2 °C within 60 s, fault.
+ *   Bed is given more headroom because beds heat slowly.
+ */
+#define WATCH_TEMP_PERIOD          40   // (s) Heater ramp-up watch window
+#define WATCH_TEMP_INCREASE         2   // (°C) Minimum hotend temp rise required during that window
+#define WATCH_BED_TEMP_PERIOD      60   // (s) Bed ramp-up watch window
+#define WATCH_BED_TEMP_INCREASE     2   // (°C) Minimum bed temp rise required during that window
+
 //===========================================================================
 //==================== Z Steppers & Tramming ================================
 //===========================================================================

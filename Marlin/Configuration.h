@@ -631,7 +631,8 @@
  * the BLTouch probe (PC2), so PA0 is free for the filament sensor.
  * Confirmed by community guide for Artillery Sidewinder X2 (same Ruby board).
  *
- * FIL_RUNOUT_STATE LOW: pin is LOW when filament is absent (NC-type sensor with pullup).
+ * FIL_RUNOUT_STATE HIGH: pin reads HIGH when filament is absent (switch open → pullup pulls HIGH).
+ *   The wiring assumption: switch closes to GND when filament is present, opens when absent.
  * Trigger action: M600 (filament change / advanced pause).
  */
 #define FILAMENT_RUNOUT_SENSOR

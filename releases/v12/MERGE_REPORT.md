@@ -94,6 +94,70 @@ Compared to v10 the variables stacked are: `STARTUP_COMMANDS` revert (v11) + `FT
 
 ---
 
+## Change 4: enable Thermal Runaway heating-ramp watch (`WATCH_TEMP_PERIOD` + bed)
+
+### What changed
+
+`Marlin/Configuration_adv.h` — new block in Thermal Settings:
+
+```cpp
+#define WATCH_TEMP_PERIOD          40   // (s) Heater ramp-up watch window
+#define WATCH_TEMP_INCREASE         2   // (°C) Min hotend rise required in that window
+#define WATCH_BED_TEMP_PERIOD      60   // (s) Bed ramp-up watch window
+#define WATCH_BED_TEMP_INCREASE     2   // (°C) Min bed rise required in that window
+```
+
+### Why
+
+This is the **second occurrence of the same slim-config safety regression** that produced the auto-fan miss in Change 3. The fork's slimmed `Configuration_adv.h` had no `WATCH_TEMP_*` defines at all. Marlin's `WATCH_HOTENDS` flag is gated by `Conditionals-5-post.h:2732`:
+
+```c
+#if ENABLED(THERMAL_PROTECTION_HOTENDS) && WATCH_TEMP_PERIOD > 0
+  #define WATCH_HOTENDS 1
+#endif
+```
+
+When `WATCH_TEMP_PERIOD` is undefined the preprocessor evaluates it as `0`, so `0 > 0` is false and `WATCH_HOTENDS` is silently NOT defined — *despite* `THERMAL_PROTECTION_HOTENDS` being on. The result: the heating-ramp watch (the protection that catches a dead heater during heat-up) was completely off, even though `M115` reported thermal protection as enabled.
+
+Steady-state thermal runaway protection (the `THERMAL_PROTECTION_PERIOD` / `_HYSTERESIS` mechanism defined in `Configuration.h`) was unaffected and is still active. But the ramp-up watch, which catches an open thermistor, broken heater cartridge, or stuck MOSFET *before* the printer claims temperature was reached, was off.
+
+Same root cause as the auto-fan miss: slim config dropped a load-bearing default and the Conditionals macro silently disables the feature.
+
+### Cost
+
+Linker added the `HeaterWatch<>` template instantiation and surrounding guards to the binary — verifies the feature is now actually compiled in, not just no longer a syntax error.
+
+| Metric | pre-fix v12 | post-fix v12 | Delta |
+|---|---|---|---|
+| Flash | 74.1% (194,288 B) | 74.4% (195,064 B) | +776 B |
+| RAM | 69.3% (45,416 B) | 69.3% (45,432 B) | +16 B |
+
+The +776 B Flash is the new code path that was previously dead-stripped (because `WATCH_HOTENDS` was 0). That's the auditable evidence the fix took effect.
+
+---
+
+## Change 5: sync 5 more upstream commits (round 2 within v12)
+
+Round-2 upstream sync after the initial v12 push:
+
+| SHA | Subject |
+|---|---|
+| `8c79ed3892` | [cron] Bump distribution date (2026-06-08) |
+| `f5ff51b674` | 🔧 Enable HOST_ACTION_COMMANDS by default (#28442) — no-op for us, we already had it on |
+| `92a5c34d35` | [cron] Bump distribution date (2026-06-06) |
+| `d3e1cbd554` | 🔧 Enforce monotonic bed description (#28310) — bed-leveling helper |
+| `428ceb8172` | 🩹 Better guard of keypad_buttons = 0 (#28417) — only fires with keypad UI, irrelevant here |
+
+None touch HAL/STM32, usb_serial, thermal, or motion. Merge required `--ours` resolution on `Configuration_adv.h` again (same fork-vs-upstream diff pattern as prior rounds); upstream-only deltas in the resolved file were the usual inert/commented-out boilerplate.
+
+---
+
+## Change 6: fix stale internal docstring on filament-runout sensor
+
+`Marlin/Configuration.h:634` block-comment used to say `FIL_RUNOUT_STATE LOW: pin is LOW when filament is absent` while the actual define on line 641 sets `FIL_RUNOUT_STATE HIGH`. The actual setting is correct given the user's documented wiring (switch closes to GND when filament present, pullup pulls HIGH when absent). Only the stale docstring was wrong — no behavior change, but a cross-AI audit flagged it as a likely contradiction and the comment was sweeping confusion across future reviews. Updated to match.
+
+---
+
 ## Change 3: enable Extruder Auto-Fan on `E0_AUTO_FAN_PIN = PC7` (FAN1)
 
 ### What changed

@@ -39,6 +39,19 @@ Download and install [STM32CubeProgrammer](https://www.st.com/en/development-too
 
 ## What's new in v12
 
+### -1. Thermal Runaway heating-ramp watch enabled — **safety fix** (silent regression)
+
+`Marlin/Configuration_adv.h` — added:
+
+```cpp
+#define WATCH_TEMP_PERIOD          40   // (s)
+#define WATCH_TEMP_INCREASE         2   // (°C)
+#define WATCH_BED_TEMP_PERIOD      60   // (s)
+#define WATCH_BED_TEMP_INCREASE     2   // (°C)
+```
+
+Same slim-config-drop pattern as the auto-fan miss: `Conditionals-5-post.h` only enables `WATCH_HOTENDS` when `WATCH_TEMP_PERIOD > 0`. With the define missing, that test silently evaluated false and the ramp-up watch was off — *despite* `M115` reporting thermal protection as enabled. This protects you against a dead hotend or bed heater that fails to actually rise in temperature during heat-up. Steady-state thermal runaway (post-target drift) was already covered by `THERMAL_PROTECTION_PERIOD` in `Configuration.h` and continues to work.
+
 ### 0. Hotend Extruder Auto-Fan enabled — **safety fix** (regression vs stock Artillery)
 
 `Marlin/Configuration_adv.h` — new block:
@@ -73,12 +86,12 @@ None touch HAL/STM32, usb_serial, the host-action emitters, the auto-report time
 
 ### Build result
 
-| | v11 | v12 |
+| | v11 | v12 (current) |
 |---|---|---|
-| Flash | 74.1% (194,120 B) | 74.1% (194,288 B) |
-| RAM | 58.7% (38,500 B) | 69.3% (45,416 B) |
+| Flash | 74.1% (194,120 B) | 74.4% (195,064 B) |
+| RAM | 58.7% (38,500 B) | 69.3% (45,432 B) |
 
-The +6,916 B RAM cost is dominated by `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B for the FT_MOTION ring; the auto-fan handler adds only a couple of bytes. Flash +168 B vs v11. ~19.6 KB RAM headroom remains.
+The +6,932 B RAM cost is dominated by `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B for the FT_MOTION ring; the auto-fan handler and `HeaterWatch` state together add a few dozen bytes. Flash +944 B vs v11 (auto-fan handler + thermal-ramp watch code paths now compiled in). ~19.6 KB RAM headroom remains.
 
 ---
 
