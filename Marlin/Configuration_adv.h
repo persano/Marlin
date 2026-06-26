@@ -500,7 +500,30 @@
 //#define SERIAL_STATS_RX_FRAMING_ERRORS
 //#define SERIAL_STATS_DROPPED_RX
 
-#define ADVANCED_OK  // ADDED: extend OK response with line number, planner space, and queue info
+/**
+ * ADVANCED_OK — DISABLED (v12 diagnostic revert for Beagle deadlock)
+ *
+ * Was enabled. Reverted because issue MarlinFirmware/Marlin#24347 confirms
+ * the same Artillery Sidewinder X2 hardware family deadlocks when this is
+ * on and a serial streamer / proxy is in the path. The Beagle is exactly
+ * that class of host (sniffs Marlin's stream for //action: directives).
+ *
+ * ADVANCED_OK changes the `ok` response from plain `ok` to
+ * `ok N<n> P<p> B<b>` (line number + planner buffer count + serial buffer
+ * count). Hosts that don't parse the new format break the handshake — the
+ * underlying mechanism behind both #24347's "stuck at 0%" and our
+ * Resend: N<n> infinite loop.
+ *
+ * If the v12 binary with this disabled prints cleanly through the Beagle
+ * where prior v12 deadlocked, the protocol-mismatch hypothesis is
+ * confirmed and ADVANCED_OK should stay off on any build intended to
+ * print through a passive serial proxy.
+ *
+ * Side effect: BufferBuddy and similar serial streamers that REQUIRE
+ * ADVANCED_OK to keep Marlin's command buffer full will no longer work.
+ * The user is not running those plugins, so no functional loss.
+ */
+//#define ADVANCED_OK  // DISABLED in v12 — see MarlinFirmware/Marlin#24347
 #define SERIAL_OVERRUN_PROTECTION  // Throttle when serial buffer is full to prevent data loss
 #define FASTER_GCODE_PARSER  // Use a smaller, faster G-code parser
 #define PAREN_COMMENTS       // Support (comments in parentheses) — used by Simplify3D and some post-processors

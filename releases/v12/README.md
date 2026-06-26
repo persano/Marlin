@@ -39,6 +39,18 @@ Download and install [STM32CubeProgrammer](https://www.st.com/en/development-too
 
 ## What's new in v12
 
+### -3. `ADVANCED_OK` disabled — protocol-content revert for the Beagle deadlock
+
+`Marlin/Configuration_adv.h:503` — `#define ADVANCED_OK` commented out.
+
+`ADVANCED_OK` replaces Marlin's plain `ok` response with `ok N<n> P<p> B<b>` (line number + planner buffer + serial buffer counts). Serial streamers/proxies that don't understand the new format break the line-numbered handshake — exactly the failure mode reported in [MarlinFirmware/Marlin#24347](https://github.com/MarlinFirmware/Marlin/issues/24347), which is on the same Artillery Sidewinder X2 hardware family.
+
+The Beagle is in this class (it parses the stream for `//action:` time-lapse triggers). With `ADVANCED_OK` off the response is plain `ok` and the Beagle's parser can handshake correctly.
+
+This is the #2 protocol-content variable in the original v10/v11 deadlock investigation (after STARTUP_COMMANDS, which was already reverted in v11). #24347 promoted it to a hard candidate. Flash dropped 168 B confirming the formatting code is no longer compiled in.
+
+Side effect: BufferBuddy and similar plugins requiring `ADVANCED_OK` won't work. User doesn't run them.
+
 ### -2. `FAN_MIN_PWM 50` — part-cooling fan stall mitigation
 
 `Marlin/Configuration_adv.h` — `#define FAN_MIN_PWM 50` added.
@@ -96,10 +108,10 @@ None touch HAL/STM32, usb_serial, the host-action emitters, the auto-report time
 
 | | v11 | v12 (current) |
 |---|---|---|
-| Flash | 74.1% (194,120 B) | 74.5% (195,176 B) |
+| Flash | 74.1% (194,120 B) | 74.4% (195,008 B) |
 | RAM | 58.7% (38,500 B) | 69.3% (45,432 B) |
 
-The +6,932 B RAM cost is dominated by `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B for the FT_MOTION ring; the auto-fan handler and `HeaterWatch` state together add a few dozen bytes. Flash +1,056 B vs v11 (auto-fan handler + thermal-ramp watch + FAN_MIN_PWM remap code paths + 21 cumulative upstream commits). ~19.6 KB RAM headroom remains.
+The +6,932 B RAM cost is dominated by `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B for the FT_MOTION ring; the auto-fan handler and `HeaterWatch` state together add a few dozen bytes. Flash +888 B vs v11 (auto-fan handler + thermal-ramp watch + FAN_MIN_PWM remap code paths + 21 cumulative upstream commits, **minus 168 B from ADVANCED_OK being reverted**). ~19.6 KB RAM headroom remains.
 
 ---
 

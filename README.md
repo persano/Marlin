@@ -113,7 +113,7 @@ Full comparison against stock Marlin 2.1.x, the gpro-mp reference, and Marlin-fo
 | XON/XOFF flow control | no | yes | **no** | yes |
 | Serial overrun protection | no | no | yes | yes |
 | Faster G-code parser | no | no | yes | yes |
-| ADVANCED_OK | no | yes | yes | yes |
+| ADVANCED_OK | no | yes | yes | **no** (v12 — reverted; breaks Beagle proxy, see #24347) |
 | Emergency parser | no | no | yes | yes |
 | Host action commands | no | no | yes | yes |
 | Host prompt support | no | no | yes | yes |

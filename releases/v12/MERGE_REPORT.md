@@ -136,6 +136,46 @@ The +776 B Flash is the new code path that was previously dead-stripped (because
 
 ---
 
+## Change 9: disable `ADVANCED_OK` — second protocol-content revert (Beagle deadlock)
+
+### What changed
+
+`Marlin/Configuration_adv.h:503` — commented out `#define ADVANCED_OK`.
+
+### Why
+
+Issue [MarlinFirmware/Marlin#24347](https://github.com/MarlinFirmware/Marlin/issues/24347) reports the same Artillery Sidewinder X2 hardware family (same Ruby board) deadlocking when `ADVANCED_OK` is on and a serial streamer / proxy is in the path. Resolution from Marlin contributor InsanityAutomation:
+
+> "That's an issue with the MKS TFT being used for the USB/SD host. That is also a serial streamer, like octoprint, and doesn't support advanced OK."
+
+`ADVANCED_OK` replaces Marlin's plain `ok` response with `ok N<n> P<p> B<b>` (line number + planner-buffer count + serial-buffer count). Any serial proxy that parses the response and doesn't understand the new format breaks the line-numbered handshake.
+
+The Beagle is exactly that class of host — it parses Marlin's stream to sniff `//action:` directives for time-lapse triggers. If the Beagle's parser only knows about plain `ok` and sees `ok N5 P10 B3` instead, the handshake desyncs. Same mechanism behind both #24347's "stuck at 0%" (silent stall) and our `Resend: N<n>` infinite loop (re-ack storm).
+
+The original v10 → v11 investigation ranked `ADVANCED_OK` as the #2 protocol-content suspect after `STARTUP_COMMANDS` (reverted in v11). #24347 is the missing ground-truth evidence promoting it to v12's next-flip.
+
+### Side effect
+
+Hosts that REQUIRE `ADVANCED_OK` to manage Marlin's command buffer (BufferBuddy, some advanced OctoPrint plugins) will no longer work. User does not run these — no functional loss.
+
+### Cost
+
+| Metric | prior v12 push | post-revert v12 | Delta |
+|---|---|---|---|
+| Flash | 74.5% (195,176 B) | 74.4% (195,008 B) | **−168 B** |
+| RAM | 69.3% (45,432 B) | 69.3% (45,432 B) | 0 B |
+
+The −168 B Flash is the `ADVANCED_OK` formatting/state code being dead-stripped. Auditable evidence the revert took effect at the binary level.
+
+### Verification protocol (A/B vs the prior v12 push)
+
+The flash on this v12 is the only variable changed against the prior v12 push. If a previously-Beagle-deadlocking gcode now prints cleanly:
+
+- **Strong signal:** the deadlock has a serial-protocol-mismatch component. The Beagle was misreading `ok N<n> P<p> B<b>`. Keep `ADVANCED_OK` off in all builds intended to print through the Beagle (or any passive serial proxy).
+- **No change:** ADVANCED_OK is not the cause. Move to the next suspect — `HOST_ACTION_COMMANDS` block, `AUTO_REPORT_POSITION`, `AUTO_REPORT_SD_STATUS`, `REPORT_FAN_CHANGE`, `RX_BUFFER_SIZE 1024`.
+
+---
+
 ## Change 8: sync 16 more upstream commits (round 3 within v12, through 2026-06-26)
 
 Latest upstream sync after the FAN_MIN_PWM commit. 16 commits through `5b0e1a6111`:
