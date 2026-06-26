@@ -136,6 +136,58 @@ The +776 B Flash is the new code path that was previously dead-stripped (because
 
 ---
 
+## Change 10: revert PR #26952 — restore continuous M155 reports during heat-up
+
+### What changed
+
+`Marlin/src/module/temperature.cpp:4550` — commented out the line `if (marlin.is_heating()) return;` inside `Temperature::AutoReportTemp::report()`. M155 auto-temperature reports now fire on their interval regardless of `M109`/`M190` wait state.
+
+### Why
+
+Upstream PR [MarlinFirmware/Marlin#26952](https://github.com/MarlinFirmware/Marlin/pull/26952) ("Fix Duplicated Temp Report" by InsanityAutomation) added `if (wait_for_heatup) return;` to suppress M155 lines while a wait-for-temperature loop was active, with the stated goal of deduplicating the temp output during `M109`/`M190` (which already emit their own "Heating..." temp updates). Later refactoring wrapped the global behind the helper class — the current code is `if (marlin.is_heating()) return;` where `is_heating()` is `return wait_for_heatup;` (`MarlinCore.h:89`).
+
+ellensp identified this as a regression in [#27645](https://github.com/MarlinFirmware/Marlin/issues/27645), with the same symptom pattern reported in [#25157](https://github.com/MarlinFirmware/Marlin/issues/25157) across LPC176X (WEREWOLF1973, IndaloGo), GD32F303 (dsovsyannikov), and ATMEGA2560 (efsa91) hardware: TFT-style passive hosts stopped working after the upgrade from Marlin 2.1.1 to 2.1.2. Root cause: the wait loop uses `wait_for_heatup` as a *success indicator* and can exit with the flag still true; if the host then issues `M108` mid-wait or the wait path ends via a non-normal route, M155 stays silent indefinitely. A TFT or Beagle-style proxy parsing the temp stream for liveness sees nothing and concludes the printer is unresponsive.
+
+The Beagle is exactly this class of host (it parses Marlin's stream to sniff `//action:` directives for time-lapse triggers). Same mechanism that #24347 / Change 9 addressed for `ADVANCED_OK`: a serial-aware host expects a steady stream of state, Marlin goes uncharacteristically silent in an edge case, host can't resync.
+
+This is a source-level revert, not a Configuration toggle. The patch carries a comment explaining the rationale so future upstream syncs leave it intact — re-apply if a merge ever restores the line.
+
+### Side effect
+
+During `M109`/`M190` heat-up the host sees both:
+- the wait loop's own busy "Heating..." temp echo (Marlin emits one on each wait poll)
+- the M155 timer's regular `T:...` line
+
+Duplicate temp output during heat-up only — cosmetic regression of what PR #26952 was trying to fix. Hosts that parse the temp stream byte-by-byte handle duplicates fine; humans reading the serial console see two `T:` lines per second instead of one for the duration of heat-up.
+
+### Cost
+
+| Metric | post-ADVANCED_OK-revert | post-#26952-revert | Delta |
+|---|---|---|---|
+| Flash | 74.4% (195,008 B) | 74.4% (195,000 B) | −8 B |
+| RAM | 69.3% (45,432 B) | 69.3% (45,432 B) | 0 B |
+
+The −8 B Flash is the `is_heating()` load + test + early-return branch being dead-stripped. The function now unconditionally calls `print_heater_states`.
+
+### Verification protocol (A/B vs the prior v12 push)
+
+The patched temperature.cpp line is the only variable changed against the prior v12 push (which already has Change 9's `ADVANCED_OK` revert). If a previously-Beagle-deadlocking gcode now prints cleanly, and the prior v12 with `ADVANCED_OK` off did NOT fix it:
+
+- **Strong signal:** the deadlock involves a heat-up-window silence component. The Beagle was losing track of the printer during `M109`/`M190` because M155 went mute, and recovery never happened cleanly. Keep this patch in all future builds.
+- **No change vs prior v12:** PR #26952's behavior was not the cause. Source revert can stay (continuous temp output is harmless and a defensive choice) or be reverted — your call.
+
+If the prior v12 already fixed it via `ADVANCED_OK` off, this Change is redundant for the Beagle bug but still defensible as a fragility-reduction patch (it removes a known-buggy edge case).
+
+### Source-level patch — maintenance note
+
+Because this lives in `Marlin/src/module/temperature.cpp` rather than `Configuration_adv.h`, it requires per-merge attention:
+
+1. On every `git merge upstream/bugfix-2.1.x`, check if `temperature.cpp:4550` was touched.
+2. If upstream rewrote the surrounding lines, re-apply the comment-out and rationale block.
+3. The line will not conflict cleanly with `--ours` resolution because the patched form is divergent — verify manually with `git diff upstream/bugfix-2.1.x -- Marlin/src/module/temperature.cpp`.
+
+---
+
 ## Change 9: disable `ADVANCED_OK` — second protocol-content revert (Beagle deadlock)
 
 ### What changed

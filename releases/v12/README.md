@@ -39,6 +39,16 @@ Download and install [STM32CubeProgrammer](https://www.st.com/en/development-too
 
 ## What's new in v12
 
+### -4. PR #26952 reverted — restore continuous M155 reports during heat-up
+
+`Marlin/src/module/temperature.cpp:4550` — commented out `if (marlin.is_heating()) return;` inside `Temperature::AutoReportTemp::report()`.
+
+Upstream PR #26952 added a guard that suppresses M155 auto-temp reports while `wait_for_heatup` is true (during `M109`/`M190`). [Issue #27645](https://github.com/MarlinFirmware/Marlin/issues/27645) and [issue #25157](https://github.com/MarlinFirmware/Marlin/issues/25157) document a regression where the flag occasionally fails to clear, silencing M155 forever — multiple users across LPC176X, GD32F303, ATMEGA2560 hardware report their TFT/proxy hosts go offline after the wait. The Beagle is in the same class of passive serial proxy.
+
+With the guard removed, M155 fires unconditionally on its interval. Hosts get a continuous temp stream regardless of wait state. Cosmetic side effect: during heat-up the host sees both the wait loop's own busy "Heating..." temp echo AND the M155 timer's `T:...` line (duplicate temp output for the duration of heat-up only — what PR #26952 was trying to fix).
+
+This is a source-level patch, not a config flag — carries a rationale comment so future upstream syncs leave it intact. Flash dropped 8 B confirming the early-return branch is no longer compiled in.
+
 ### -3. `ADVANCED_OK` disabled — protocol-content revert for the Beagle deadlock
 
 `Marlin/Configuration_adv.h:503` — `#define ADVANCED_OK` commented out.
@@ -108,10 +118,10 @@ None touch HAL/STM32, usb_serial, the host-action emitters, the auto-report time
 
 | | v11 | v12 (current) |
 |---|---|---|
-| Flash | 74.1% (194,120 B) | 74.4% (195,008 B) |
+| Flash | 74.1% (194,120 B) | 74.4% (195,000 B) |
 | RAM | 58.7% (38,500 B) | 69.3% (45,432 B) |
 
-The +6,932 B RAM cost is dominated by `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B for the FT_MOTION ring; the auto-fan handler and `HeaterWatch` state together add a few dozen bytes. Flash +888 B vs v11 (auto-fan handler + thermal-ramp watch + FAN_MIN_PWM remap code paths + 21 cumulative upstream commits, **minus 168 B from ADVANCED_OK being reverted**). ~19.6 KB RAM headroom remains.
+The +6,932 B RAM cost is dominated by `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B for the FT_MOTION ring; the auto-fan handler and `HeaterWatch` state together add a few dozen bytes. Flash +880 B vs v11 (auto-fan handler + thermal-ramp watch + FAN_MIN_PWM remap code paths + 21 cumulative upstream commits, **minus 168 B from ADVANCED_OK being reverted and minus 8 B from PR #26952 being reverted**). ~19.6 KB RAM headroom remains.
 
 ---
 

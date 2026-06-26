@@ -4547,7 +4547,13 @@ void Temperature::isr() {
   #if ENABLED(AUTO_REPORT_TEMPERATURES)
     AutoReporter<Temperature::AutoReportTemp> Temperature::auto_reporter;
     void Temperature::AutoReportTemp::report() {
-      if (marlin.is_heating()) return;
+      // Reverted PR #26952: do not suppress M155 reports during M109/M190 waits.
+      // The original PR aimed to deduplicate temp lines but introduced a regression
+      // where wait_for_heatup occasionally stays true after the wait exits, silencing
+      // M155 forever (see MarlinFirmware/Marlin#27645 and #25157). Continuous reports
+      // matter for TFT/Beagle-style passive serial proxies that interpret silence
+      // as printer-offline. Cost: duplicate temp lines during heat-up - cosmetic only.
+      // if (marlin.is_heating()) return;
       print_heater_states(motion.extruder OPTARG(HAS_TEMP_REDUNDANT, ENABLED(AUTO_REPORT_REDUNDANT)));
       SERIAL_EOL();
     }
