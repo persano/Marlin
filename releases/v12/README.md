@@ -96,10 +96,10 @@ None touch HAL/STM32, usb_serial, the host-action emitters, the auto-report time
 
 | | v11 | v12 (current) |
 |---|---|---|
-| Flash | 74.1% (194,120 B) | 74.4% (195,104 B) |
+| Flash | 74.1% (194,120 B) | 74.5% (195,176 B) |
 | RAM | 58.7% (38,500 B) | 69.3% (45,432 B) |
 
-The +6,932 B RAM cost is dominated by `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B for the FT_MOTION ring; the auto-fan handler and `HeaterWatch` state together add a few dozen bytes. Flash +984 B vs v11 (auto-fan handler + thermal-ramp watch + FAN_MIN_PWM remap code paths now compiled in). ~19.6 KB RAM headroom remains.
+The +6,932 B RAM cost is dominated by `(512 − 128) × sizeof(stepper_plan_t)` = 384 × 18 B for the FT_MOTION ring; the auto-fan handler and `HeaterWatch` state together add a few dozen bytes. Flash +1,056 B vs v11 (auto-fan handler + thermal-ramp watch + FAN_MIN_PWM remap code paths + 21 cumulative upstream commits). ~19.6 KB RAM headroom remains.
 
 ---
 

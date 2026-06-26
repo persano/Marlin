@@ -136,6 +136,38 @@ The +776 B Flash is the new code path that was previously dead-stripped (because
 
 ---
 
+## Change 8: sync 16 more upstream commits (round 3 within v12, through 2026-06-26)
+
+Latest upstream sync after the FAN_MIN_PWM commit. 16 commits through `5b0e1a6111`:
+
+| SHA | Subject | Relevant to Genius Pro? |
+|---|---|---|
+| `5b0e1a6111` | [cron] Bump distribution date (2026-06-26) | infra |
+| `a940c26490` | 🐛 Fix ESP32 build with WiFi (#28469) | no — no ESP32 |
+| `12875be7a9` | [cron] Bump distribution date (2026-06-25) | infra |
+| `045f078df3` | ✅ Refine parallel builds | infra |
+| `f6e00bfa99` | [cron] Bump distribution date (2026-06-24) | infra |
+| `1f255d16ec` | 🚸 'M421 I J' bounds-checking (#28468) | UBL command — tiny robustness fix |
+| `3fe641e081` | 🚸 Preserve workspace with G28 (#28465) | homing-behavior fix |
+| `c3974eadf2` | [cron] Bump distribution date (2026-06-23) | infra |
+| `2f0b5f04a7` | 🚸 Fix menu value Y pos (#28464) | LCD UI only |
+| `0bc89dd620` | 🧑‍💻 Matching config.py files | build infra |
+| `aedbcb5063` | [cron] Bump distribution date (2026-06-22) | infra |
+| `da81bba7c8` | 🔧 Sanity Check Resonance Test for standard Shaping | added a sanity check; our INPUT_SHAPING config passes (build OK) |
+| `d79dbb0dfc` | 🚸 Disable FT_MOTION for M48 (#28314) | **FT_MOTION-related fix** — temporarily disables FT_MOTION during M48 probe-repeatability test to avoid interference; we use both, so this is welcome |
+| `9048d826a4` | [cron] Bump distribution date (2026-06-19) | infra |
+| `7f2ef9d04d` | ✅ Ignore schema.json file | gitignore + removed file |
+| `46376028e5` | [cron] Bump distribution date (2026-06-16) | infra |
+| `e255770605` | 🔧 Unified input shaping Resonance Test (#28282) | **refactor**: resonance-test code moved from `Marlin/src/module/ft_motion/` to `Marlin/src/feature/resonance/`. Behavior preserved. |
+
+**None** touch HAL/STM32, usb_serial, the host serial path, thermal protection, or the auto-fan/watch-temp blocks I added. The protocol-content A/B against v11 remains readable.
+
+Configuration_adv.h conflict again resolved with `--ours` (same fork-vs-upstream diff pattern).
+
+Build delta vs prior v12 push: Flash 74.4% → 74.5% (+72 B from upstream code changes), RAM unchanged at 69.3% (45,432 B).
+
+---
+
 ## Change 5: sync 5 more upstream commits (round 2 within v12)
 
 Round-2 upstream sync after the initial v12 push:
