@@ -30,6 +30,9 @@
   #include "ft_motion/trajectory_poly5.h"
   #include "ft_motion/trajectory_poly6.h"
 #endif
+#if ENABLED(FTM_CONSTANT_JOLT)
+  #include "ft_motion/trajectory_constant_jolt.h"
+#endif
 #if ENABLED(RESONANCE_TEST)
   #include "../feature/resonance/resonance_generator.h"
 #endif
@@ -80,7 +83,7 @@ typedef struct FTConfig {
 
     #if HAS_DYNAMIC_FREQ
       dynFreqMode_t dynFreqMode = FTM_DEFAULT_DYNFREQ_MODE; // Dynamic frequency mode configuration.
-      ft_shaped_float_t dynFreqK = { 0.0f };                // Scaling / gain for dynamic frequency. [Hz/mm] or [Hz/g]
+      ft_shaped_xy_float_t dynFreqK = { 0.0f };             // Scaling / gain for dynamic frequency. [Hz/mm] or [Hz/g]
     #else
       static constexpr dynFreqMode_t dynFreqMode = dynFreqMode_DISABLED;
     #endif
@@ -93,9 +96,20 @@ typedef struct FTConfig {
 
   #if ENABLED(FTM_POLYS)
     float poly6_acceleration_overshoot; // Overshoot factor for Poly6 (1.25 to 2.0)
+  #endif
+  #if HAS_FTM_TRAJECTORY_SELECTION
     TrajectoryType trajectory_type = TrajectoryType::FTM_TRAJECTORY_TYPE; // Trajectory generator type
   #else
     static constexpr TrajectoryType trajectory_type = TrajectoryType::TRAPEZOIDAL;
+  #endif
+  #if ENABLED(FTM_CONSTANT_JOLT)
+    float jolt = FTM_DEFAULT_JOLT * 1000.0f;  // (mm/s³) stored internally; FTM_DEFAULT_JOLT is in m/s³
+
+    void set_jolt(float j) {
+      LIMIT(j, 1000.0f, 10'000'000.0f);
+      prep_for_shaper_change();
+      jolt = j;
+    }
   #endif
 
   static void prep_for_shaper_change();
@@ -159,14 +173,14 @@ typedef struct FTConfig {
     #if HAS_DYNAMIC_FREQ
 
       uint8_t setDynFreqMode(const uint8_t m) {
-        if (dynFreqMode_t(m) == dynFreqMode) return 0;
-        switch (dynFreqMode_t(m)) {
+        if ((dynFreqMode_t)m == dynFreqMode) return 0;
+        switch ((dynFreqMode_t)m) {
           default: return 2;
           TERN_(HAS_DYNAMIC_FREQ_MM, case dynFreqMode_Z_BASED:)
           TERN_(HAS_DYNAMIC_FREQ_G, case dynFreqMode_MASS_BASED:)
           case dynFreqMode_DISABLED:
             prep_for_shaper_change();
-            dynFreqMode = dynFreqMode_t(m);
+            dynFreqMode = (dynFreqMode_t)m;
             break;
         }
         update_shaping_params();
@@ -179,6 +193,7 @@ typedef struct FTConfig {
       }
 
       bool setDynFreqK(const AxisEnum a, const float k) {
+        //assert(a == X_AXIS || X == Y_AXIS, "Dynamic Frequency only applies to XY axes.");
         if (!modeUsesDynFreq()) return false;
         if (k == dynFreqK[a]) return false;
         prep_for_shaper_change();
@@ -227,6 +242,7 @@ typedef struct FTConfig {
     #endif // HAS_FTM_SHAPING
 
     TERN_(FTM_POLYS, poly6_acceleration_overshoot = FTM_POLY6_ACCELERATION_OVERSHOOT);
+    TERN_(FTM_CONSTANT_JOLT, jolt = FTM_DEFAULT_JOLT * 1000.0f);
 
     update_shaping_params();
   }
@@ -253,7 +269,9 @@ class FTMotion {
         #undef _RESET_SMOOTH
       #endif
 
-      TERN_(FTM_POLYS, setTrajectoryType(TrajectoryType::FTM_TRAJECTORY_TYPE));
+      #if HAS_FTM_TRAJECTORY_SELECTION
+        setTrajectoryType(TrajectoryType::FTM_TRAJECTORY_TYPE);
+      #endif
 
       reset();
     }
@@ -285,11 +303,11 @@ class FTMotion {
     #endif
 
     // Trajectory generator selection
-    #if ENABLED(FTM_POLYS)
+    #if HAS_FTM_TRAJECTORY_SELECTION
       static void setTrajectoryType(const TrajectoryType type);
       static bool updateTrajectoryType(const TrajectoryType type);
     #endif
-    static TrajectoryType getTrajectoryType() { return TERN(FTM_POLYS, trajectoryType, TrajectoryType::TRAPEZOIDAL); }
+    static TrajectoryType getTrajectoryType() { return TERN(HAS_FTM_TRAJECTORY_SELECTION, trajectoryType, TrajectoryType::TRAPEZOIDAL); }
     static FSTR_P getTrajectoryName();
 
     FORCE_INLINE static bool axis_is_moving(const AxisEnum real) {
@@ -341,6 +359,11 @@ class FTMotion {
     #if ENABLED(FTM_POLYS)
       static Poly5TrajectoryGenerator poly5Generator;
       static Poly6TrajectoryGenerator poly6Generator;
+    #endif
+    #if ENABLED(FTM_CONSTANT_JOLT)
+      static ConstantJoltTrajectoryGenerator cjGenerator;
+    #endif
+    #if HAS_FTM_TRAJECTORY_SELECTION
       static TrajectoryType trajectoryType;
       static TrajectoryGenerator* currentGenerator;
     #else
