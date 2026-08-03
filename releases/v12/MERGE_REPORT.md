@@ -136,6 +136,90 @@ The +776 B Flash is the new code path that was previously dead-stripped (because
 
 ---
 
+## Change 11: sync 51 more upstream commits (round 4 within v12, through 2026-08-03)
+
+Upstream sync bringing the fork current with `upstream/bugfix-2.1.x` through `2b04e57f4d`
+(2026-08-03 distribution date). 51 commits: 20 cron distribution-date bumps and 31 real changes.
+
+### Substantive commits relevant to this target
+
+| SHA | Subject | Relevance |
+|---|---|---|
+| `e58ae317f2` | ✨ FTMotion Constant Jolt Trajectory planner (#28476) | **new opt-in FT_MOTION trajectory** — `FTM_CONSTANT_JOLT`, off by default upstream and not enabled here |
+| `27e5e60c65` | 🐛 Keep FT_MOTION active with Constant Jolt Trajectory (#28480) | touches `planner.cpp` — see analysis below |
+| `84bb38e4ed` | 🚸🩹 FT Motion M493 Dynamic Frequency XY-only (#28509) | M493 dynamic-frequency reporting restricted to X/Y; our shapers are ZV on X/Y, NONE on Z/E |
+| `7aa53aeae7` | 🩹🚸 Report FT Motion Axis Sync in M493 (#28496) | M493 report-only addition |
+| `d059ce1573` | 🚸 Reject G-codes > 65535 (#28497) | gcode parser bounds-check; no valid G/M code we emit is affected |
+| `90784e5da6` | 🔧 Require pins as macros (#28487) | adds `#ifndef PA0 → #error` to `HAL/STM32/inc/SanityCheck.h`. **Build passes**, so the Ruby variant does define pins as macros — positively verified, not assumed |
+| `74f9aa8e23` | 🐛 Apply static_cast to fix overflow (#28485) | `temperature.cpp` overflow fix — merged cleanly alongside our #26952 revert |
+| `908c25c23c` | 🩹 Fix PID_OPENLOOP build error (#28475) | build fix; PID_OPENLOOP is off here |
+| `424ca60979` | ✨ Temp Sensor -18 ADS1118 Thermocouple (#28176) | new sensor type; we use sensor 1 (EPCOS 100kΩ) |
+| `c64cc6dce9` | 🐛 Refactor UBL (2), clarify probe var scopes (#28510) | UBL/probe scope cleanup |
+| `b554d65c8e` | 🩹 Use type-tolerant setSDA/setSCL for I2C_EEPROM (#28495) | I2C_EEPROM not used on Ruby |
+| `75dae3394b` | 🐛 Fix I2C encoder report loop (#28501) | no I2C encoder here |
+
+Remaining 19 non-cron commits are LCD/UI (VIKI, DGUS, MKS, ProUI, ExtUI), docs (`AGENTS.md` files,
+planner comments), CI/test infrastructure, and cosmetic refactors (`NULL` → `nullptr`) — none reach
+this board's code paths.
+
+### `planner.cpp` change analysis (#28480)
+
+This is the only commit in the batch touching the motion hot path, so it was read rather than
+skimmed. With `FTM_CONSTANT_JOLT` disabled the new code reduces to:
+
+```cpp
+constexpr bool is_jolt = false;   // #else branch
+if (!is_jolt) recalculate(safe_exit_speed_sqr);
+block->flag.recalculate = !is_jolt;
+```
+
+— i.e. `recalculate()` always runs and `flag.recalculate` is always `true`, exactly the
+pre-#28476 behavior. The rest of the diff is a `vmax_junction` → `vmax_junc` local rename.
+**No behavior change for this configuration.**
+
+### Conflicts
+
+Both `Configuration.h` and `Configuration_adv.h` conflicted (the usual whole-file conflict that
+git produces against the fork's slimmed configs). Both resolved `--ours` after confirming the
+upstream deltas are inapplicable:
+
+- `Configuration.h`: upstream added **one comment line** documenting temp sensor `-18` inside the
+  "Analog Thermocouple Boards" list. The slimmed fork has no such comment block at all — nothing lost.
+- `Configuration_adv.h`: upstream moved `FTM_TRAJECTORY_TYPE` out of the `#if ENABLED(FTM_POLYS)`
+  guard and added the commented-out `FTM_CONSTANT_JOLT` block. Our copy keeps
+  `FTM_TRAJECTORY_TYPE TRAPEZOIDAL` inside the `FTM_POLYS` guard (FTM_POLYS is enabled here), so
+  the macro is still defined with the same value. Only the opt-in CONSTANT_JOLT knob is not carried
+  over — it is off by default upstream too.
+
+### Fork patches verified intact after merge
+
+Checked positively against `MERGE_HEAD`, not assumed:
+
+- `Marlin/src/module/temperature.cpp` — PR #26952 revert (commented `if (marlin.is_heating()) return;`)
+  plus the `PORT_REDIRECT`/`PORT_RESTORE` wrapping in the M109/M190 wait loops. Auto-merged clean;
+  upstream's `static_cast` overflow fix landed beside it without disturbing either patch.
+- `ini/stm32f4.ini` — `build_unflags = -flto` and the removed toolchain pin.
+- `Configuration_adv.h` safety blocks — `E0_AUTO_FAN_PIN PC7`, `EXTRUDER_AUTO_FAN_TEMPERATURE 50`,
+  `WATCH_TEMP_PERIOD 40`, `WATCH_BED_TEMP_PERIOD 60`, `FAN_MIN_PWM 50`, `FTM_BUFFER_SIZE 512`,
+  `//#define ADVANCED_OK`. All present.
+- `Configuration.h` — `THERMAL_PROTECTION_HOTENDS` / `_BED` / `_CHAMBER` / `_COOLER` and their
+  period/hysteresis values. All present.
+
+### Build delta vs prior v12 push
+
+| Metric | prior v12 push | post-sync v12 | Delta |
+|---|---|---|---|
+| Flash | 74.4% (195,000 B) | 74.4% (195,056 B) | **+56 B** |
+| RAM | 69.3% (45,432 B) | 69.3% (45,432 B) | 0 B |
+
+Binary: 238,600 B → 238,656 B (+56 B), matching the Flash figure. RAM identical, so no new
+statically-allocated state entered the build — consistent with the batch being UI/docs/CI plus
+opt-in features left off. ~19.6 KB RAM headroom remains.
+
+`releases/v12/firmware-gpro-v12-0x08000000.bin` replaced in place.
+
+---
+
 ## Change 10: revert PR #26952 — restore continuous M155 reports during heat-up
 
 ### What changed
